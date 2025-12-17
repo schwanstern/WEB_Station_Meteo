@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphique</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+
+
+    <div class="dashboard-header">    
+        <button class="menu-icon" onclick="toggleMenu()">&#9776;</button>
+
+        <div class="middle-nav">
+            <button class="data-btn active" onclick="selectData(this)">Vitesse vent</button>
+            <button class="data-btn" onclick="selectData(this)">Température</button>
+            <button class="data-btn" onclick="selectData(this)">Humidité</button>
+            <button class="data-btn" onclick="selectData(this)">Pression</button>
+            <button class="data-btn" onclick="selectData(this)">Luminosité</button>
+        </div>
+
+        <div class="header-controls">
+            <select class="graph-select">
+                <option>Last 5min</option>
+                <option>Last 15min</option>
+                <option>Last 30min</option>
+                <option>Last 1h</option>
+                <option>Last 6h</option>
+                <option>Last 1j</option>
+                <option>Last 7j</option>
+            </select>
+
+            <button class="refresh-btn" title="Rafraîchir" onclick="alert('Graphique rafraîchi !')">
+                ↻
+            </button>
+        </div>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        
+        <div class="sidebar-header">
+            <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="accueil.html">Accueil</a>
+            <a href="#">Aperçu</a>
+            <a href="graph.html" class="active">Graph</a>
+            <a href="#">Gestion</a>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="parametre.html" class="footer-icon settings" title="Paramètres">⚙</a>
+            <a href="login.html" class="footer-icon logout" title="Se déconnecter">⏻</a>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="graph-wrapper">
+            <div class="graph-box">
+                <svg class="graph-line" viewBox="0 0 500 200" preserveAspectRatio="none">
+                    <line x1="10" y1="10" x2="10" y2="190" stroke="#555" stroke-width="2" /> <line x1="10" y1="190" x2="490" y2="190" stroke="#555" stroke-width="2" /> <polyline points="10,190 50,150 100,160 150,120 200,120 250,140 300,80 350,90 400,50 450,60 490,55" 
+                              fill="none" stroke="#555" stroke-width="2" />
+                </svg>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById("sidebar");
+            var overlay = document.getElementById("overlay");
+            sidebar.classList.toggle("open");
+            overlay.classList.toggle("active");
+        }
+        // Fonction pour changer le bouton actif (Bleu)
+        function selectData(btn) {
+            // 1. On enlève la classe 'active' de tous les boutons
+            var buttons = document.getElementsByClassName('data-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+            
+            // 2. On l'ajoute uniquement sur celui qu'on vient de cliquer
+            btn.classList.add('active');
+            
+            // (Optionnel) Ici, plus tard, vous pourrez ajouter le code pour changer le graphique
+            console.log("Affichage de : " + btn.innerText); 
+        }
+        var savedTheme = localStorage.getItem("monTheme");
+        if (savedTheme === "fonce") {
+            document.body.classList.add("dark-mode");
+        }
+    </script>
+
+</body>
+</html>

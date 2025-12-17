@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion / Inscription</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-page">
+
+    <div class="card" style="width: 450px;"> <div class="tabs-container">
+            <button class="tab-btn active" onclick="openTab(event, 'connexion')">Connexion</button>
+            <button class="tab-btn" onclick="openTab(event, 'inscription')">Inscription</button>
+        </div>
+
+        <div id="connexion" class="form-section active">
+            <h2>Bon retour !</h2>
+            
+            <form action="accueil.html"> <div class="form-group">
+                    <label for="user" class="form-label">user</label>
+                    <input type="text" id="user" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">MdP</label>
+                    <input type="password" id="password" class="form-input" required>
+                </div>
+
+                <div class="forgot-link-container">
+                    <a href="mot-de-passe.html" class="forgot-link">Mdp oublier?</a>
+                </div>
+
+                <div class="btn-container">
+                    <button class="btn-blue">CONNECTION</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="inscription" class="form-section">
+            <h2>Créer un compte</h2>
+
+            <form action="accueil.html">
+                <div class="row-dual">
+                    <input type="text" placeholder="Nom" class="simple-input" required>
+                    <input type="text" placeholder="Prénom" class="simple-input" required>
+                </div>
+
+                <div class="row-dual">
+                    <input type="email" placeholder="email" class="simple-input" required>
+                    <input type="tel" placeholder="Téléphone" class="simple-input" required>
+                </div>
+
+                <div class="btn-container" style="margin-top: 20px;">
+                    <button class="btn-blue">INSCRIPTION</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            // 1. Cacher tous les formulaires
+            var i, formSection, tabBtn;
+            formSection = document.getElementsByClassName("form-section");
+            for (i = 0; i < formSection.length; i++) {
+                formSection[i].style.display = "none"; // Cache tout
+                formSection[i].classList.remove("active");
+            }
+
+            // 2. Enlever la classe "active" de tous les boutons
+            tabBtn = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tabBtn.length; i++) {
+                tabBtn[i].className = tabBtn[i].className.replace(" active", "");
+            }
+
+            // 3. Afficher le formulaire demandé et activer le bouton cliqué
+            document.getElementById(tabName).style.display = "block";
+            setTimeout(() => {
+                document.getElementById(tabName).classList.add("active");
+            }, 10); // Petit délai pour l'animation
+            
+            evt.currentTarget.className += " active";
+            
+            var savedTheme = localStorage.getItem("monTheme");
+            if (savedTheme === "fonce") {
+                document.body.classList.add("dark-mode");
+            }
+        }
+    </script>
+
+</body>
+</html>
