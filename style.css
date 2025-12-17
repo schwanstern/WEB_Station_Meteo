@@ -1,0 +1,523 @@
+/* --- VARIABLES DE COULEURS (GESTION DES THÈMES) --- */
+:root {
+    /* --- THÈME CLAIR (Vos couleurs d'origine) --- */
+    --bg-body: #f0f2f5;
+    --bg-card: #ffffff;
+    --text-main: #333333;
+    --text-muted: #555555;
+    --text-placeholder: #888888;
+    
+    --border-color: #cccccc;      /* Pour les inputs */
+    --border-light: #eeeeee;      /* Pour les séparations */
+    --border-sidebar: #f0f0f0;    /* Lignes du menu */
+    
+    --input-bg: #ffffff;
+    --hover-bg: #f9f9f9;          /* Survol menu clair */
+    --sidebar-footer: #fafafa;
+    
+    --active-blue: #007bff;       /* Reste bleu tout le temps */
+    --active-blue-hover: #0056b3;
+    --alert-red: #dc3545;
+    
+    --shadow: rgba(0, 0, 0, 0.1);
+    --grid-line: #e5e5e5;         /* Couleur de la grille du graph */
+}
+
+/* --- THÈME FONCÉ (Dark Mode) --- */
+body.dark-mode {
+    --bg-body: #18191a;
+    --bg-card: #242526;
+    --text-main: #e4e6eb;
+    --text-muted: #b0b3b8;
+    --text-placeholder: #a0a0a0;
+    
+    --border-color: #3e4042;
+    --border-light: #3e4042;
+    --border-sidebar: #2f3031;
+    
+    --input-bg: #3a3b3c;
+    --hover-bg: #3a3b3c;
+    --sidebar-footer: #1e1f20;
+    
+    --shadow: rgba(0, 0, 0, 0.5);
+    --grid-line: #444444;         /* Grille plus sombre */
+}
+
+/* --- CONFIGURATION GLOBALE --- */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg-body); /* Variable */
+    color: var(--text-main);          /* Variable */
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow-x: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* --- STYLES COMMUNS (CARTES) --- */
+.card {
+    background-color: var(--bg-card); /* Variable */
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow); /* Variable */
+    width: 400px;
+    text-align: center;
+    margin: auto;
+}
+
+/* Pour la page de connexion (centrage vertical) */
+body.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- TITRES ET TEXTES --- */
+h2 {
+    color: var(--text-main); /* Variable */
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+/* --- FORMULAIRES (LOGIN) --- */
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.form-label {
+    flex: 0 0 80px;
+    text-align: right;
+    margin-right: 15px;
+    color: var(--text-muted); /* Variable */
+    font-size: 0.9rem;
+}
+.form-input {
+    flex: 1;
+    padding: 8px;
+    background-color: var(--input-bg); /* Variable */
+    color: var(--text-main);           /* Variable */
+    border: 1px solid var(--border-color); /* Variable */
+    border-radius: 4px;
+    font-size: 1rem;
+}
+.forgot-link-container {
+    text-align: right;
+    margin-bottom: 25px;
+}
+.forgot-link {
+    color: var(--active-blue);
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+.btn-container {
+    display: flex;
+    justify-content: center;
+}
+.btn-blue {
+    background-color: var(--active-blue);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    width: 100%;
+    max-width: 200px;
+    transition: background 0.3s;
+}
+.btn-blue:hover {
+    background-color: var(--active-blue-hover);
+}
+
+/* --- NOUVEAU : DASHBOARD (PAGE D'ACCUEIL) --- */
+
+/* En-tête du dashboard */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.menu-icon {
+    font-size: 30px;
+    cursor: pointer;
+    color: var(--text-main); /* Variable */
+    background: none;
+    border: none;
+}
+
+/* Horloge XX:XX */
+.clock-display {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--text-main); /* Variable */
+    margin-top: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+}
+
+/* Conteneur principal du dashboard */
+.dashboard-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+/* Sections Messages (Général et Alerte) */
+.message-box {
+    background: var(--bg-card); /* Variable */
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px var(--shadow); /* Variable */
+    border-left: 5px solid var(--active-blue);
+}
+
+.alert-box {
+    border-left: 5px solid var(--alert-red);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.alert-icon {
+    font-size: 2rem;
+    color: var(--alert-red);
+    margin-bottom: 10px;
+}
+
+.section-title {
+    font-weight: bold;
+    color: var(--text-muted); /* Variable */
+    margin-bottom: 10px;
+    display: block;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+/* Voile noir */
+.overlay {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 900;
+}
+.overlay.active {
+    display: block;
+}
+
+/* --- LE RUBAN LATÉRAL (SIDEBAR) --- */
+.sidebar {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: -250px;
+    background-color: var(--bg-card); /* Variable */
+    box-shadow: 2px 0 5px var(--shadow); /* Variable */
+    transition: left 0.3s, background-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+/* En-tête du menu */
+.sidebar-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 20px;
+}
+
+.close-btn {
+    font-size: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-main); /* Variable */
+    padding: 0;
+    line-height: 1;
+}
+
+/* Liste des liens */
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.sidebar-menu a {
+    display: block;
+    padding: 20px 25px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    color: var(--text-main); /* Variable */
+    border-bottom: 1px solid var(--border-sidebar); /* Variable */
+    transition: 0.2s;
+}
+
+.sidebar-menu a:hover {
+    background-color: var(--hover-bg); /* Variable */
+}
+
+/* --- CLASSE ACTIVE (Le lien bleu) --- */
+.sidebar-menu a.active {
+    color: var(--active-blue);
+    font-weight: 500;
+    background-color: rgba(0, 123, 255, 0.1); /* Petit fond bleu transparent */
+}
+
+/* --- PIED DE PAGE (Footer) --- */
+.sidebar-footer {
+    margin-top: auto;
+    padding: 15px 25px 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--sidebar-footer); /* Variable */
+    border-top: 1px solid var(--border-sidebar); /* Variable */
+}
+
+.footer-icon {
+    font-size: 1.6rem;
+    color: var(--text-muted); /* Variable */
+    text-decoration: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.footer-icon:hover {
+    color: var(--active-blue);
+}
+.footer-icon.active {
+    color: var(--active-blue);
+}
+.footer-icon.logout:hover {
+    color: var(--alert-red);
+}
+
+/* --- TABS (CONNEXION) --- */
+.tabs-container {
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid var(--border-light); /* Variable */
+    margin-bottom: 30px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 15px;
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: var(--text-placeholder); /* Variable */
+    cursor: pointer;
+    font-weight: bold;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+}
+
+.tab-btn:hover {
+    color: var(--active-blue);
+    background-color: var(--hover-bg); /* Variable */
+}
+
+.tab-btn.active {
+    color: var(--active-blue);
+    border-bottom: 3px solid var(--active-blue);
+}
+
+.form-section {
+    display: none;
+}
+.form-section.active {
+    display: block;
+    animation: fadeIn 0.5s;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* --- LIGNE AVEC 2 CHAMPS --- */
+.row-dual {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+.row-dual input {
+    width: 100%;
+}
+.simple-input {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--input-bg); /* Variable */
+    color: var(--text-main);           /* Variable */
+    border: 1px solid var(--border-color); /* Variable */
+    border-radius: 4px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+/* --- PAGE GRAPH : CONTRÔLES DU HAUT --- */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.graph-select {
+    padding: 5px 10px;
+    border: 1px solid var(--border-color); /* Variable */
+    border-radius: 4px;
+    background-color: var(--input-bg); /* Variable */
+    font-size: 0.9rem;
+    color: var(--text-muted); /* Variable */
+    cursor: pointer;
+}
+
+.refresh-btn {
+    background-color: var(--bg-card); /* Variable */
+    border: 1px solid var(--border-color); /* Variable */
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--text-muted); /* Variable */
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.refresh-btn:hover {
+    background-color: var(--hover-bg); /* Variable */
+    color: var(--active-blue);
+}
+
+/* --- ZONE DU GRAPHIQUE --- */
+.graph-wrapper {
+    margin-top: 20px;
+    padding: 0 20px;
+}
+
+.graph-box {
+    width: 100%;
+    height: 400px;
+    background-color: var(--bg-card); /* Variable */
+    border: 1px solid var(--text-placeholder); /* Variable */
+    position: relative;
+    
+    /* GRILLE DU GRAPHIQUE (utilise maintenant une variable pour le trait) */
+    background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 20px 20px;
+    box-shadow: 2px 2px 5px var(--shadow); /* Variable */
+}
+
+.graph-line {
+    width: 100%;
+    height: 100%;
+}
+
+/* --- BARRE DE NAVIGATION CENTRALE (Graphique) --- */
+.middle-nav {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex: 1;
+    margin: 0 15px;
+}
+
+.data-btn {
+    background: var(--bg-card); /* Variable */
+    border: 1px solid var(--border-color); /* Variable */
+    padding: 6px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-muted); /* Variable */
+    transition: all 0.2s;
+}
+
+.data-btn:hover {
+    background-color: var(--hover-bg); /* Variable */
+    border-color: var(--text-placeholder);
+}
+
+.data-btn.active {
+    background-color: var(--active-blue);
+    color: white;
+    border-color: var(--active-blue);
+}
+
+/* --- PAGE PARAMÈTRES --- */
+.settings-title {
+    text-align: left;
+    color: var(--text-main); /* Variable */
+    border-bottom: 2px solid var(--border-light); /* Variable */
+    padding-bottom: 10px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.theme-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed var(--border-color); /* Variable */
+}{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">Paramètres</h2>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        Affichage
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="card-title">Mode Sombre / Clair</h5>
+                <p class="card-text text-muted">Basculez entre le mode sombre et le mode clair pour tout le site.</p>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="themeSwitch" style="width: 3em; height: 1.5em; cursor: pointer;" onchange="toggleTheme()">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Met le switch dans la bonne position au chargement de la page
+    const current = localStorage.getItem('theme');
+    if (current === 'light') {
+        document.getElementById('themeSwitch').checked = true;
+    }
+</script>
+{% endblock %}
