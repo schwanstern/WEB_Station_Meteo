@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Gestion du Système</h2>
+    <span class="badge bg-secondary">v1.0.0</span>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-dark text-white border-bottom border-secondary">
+                <i class="bi bi-cpu me-2"></i> État
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                        Statut Serveur
+                        <span class="badge bg-success rounded-pill">En ligne</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                        Dernière mise à jour
+                        <span class="text-muted">{{ state.last_update }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                        Connexion Base de données
+                        <span class="badge bg-success rounded-pill">OK</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100 border-0 border-top border-4 {% if state.update_available %}border-primary{% else %}border-success{% endif %}">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                
+                {% if state.update_available %}
+                    <i class="bi bi-cloud-arrow-down fs-1 text-primary mb-3"></i>
+                    <h4 class="card-title">Mise à jour disponible</h4>
+                    <p class="card-text text-muted">Une nouvelle version des drivers capteurs est prête.</p>
+                    
+                    <form method="POST">
+                        <input type="hidden" name="do_update" value="true">
+                        <button type="submit" class="btn btn-primary w-50 fw-bold">
+                            <i class="bi bi-download me-2"></i> INSTALLER
+                        </button>
+                    </form>
+                {% else %}
+                    <i class="bi bi-check-circle fs-1 text-success mb-3"></i>
+                    <h4 class="card-title">Système à jour</h4>
+                    <p class="card-text text-muted">Aucune action requise pour le moment.</p>
+                    <button class="btn btn-secondary w-50" disabled>Vérifier</button>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

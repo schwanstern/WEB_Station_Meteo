@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-primary">Vitesse vent</button>
+        <button type="button" class="btn btn-outline-secondary">Température</button>
+        <button type="button" class="btn btn-outline-secondary">Humidité</button>
+        <button type="button" class="btn btn-outline-secondary">Pression</button>
+    </div>
+
+    <div>
+        <select class="form-select" style="min-width: 150px;">
+            <option>Dernières 5min</option>
+            <option>Dernière heure</option>
+            <option>24 Heures</option>
+        </select>
+    </div>
+</div>
+
+<div class="card shadow-sm h-100">
+    <div class="card-body">
+        <h5 class="card-title text-muted mb-4">Historique</h5>
+        <div style="height: 400px; width: 100%;">
+            <canvas id="meteoChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('meteoChart').getContext('2d');
+    
+    // --- PARTIE MAGIQUE : Récupération des couleurs du thème ---
+    // On lit les variables CSS définies par Bootstrap (Dark ou Light)
+    const styles = getComputedStyle(document.body);
+    
+    // Couleur du texte (Noir en light, Blanc en dark)
+    const textColor = styles.getPropertyValue('--bs-body-color');
+    // Couleur des grilles/bordures (Gris clair en light, Gris foncé en dark)
+    const gridColor = styles.getPropertyValue('--bs-border-color');
+
+    // Données (Simulées ou venant de Python)
+    const chartData = {{ data | default([]) | tojson }}; 
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['1min', '2min', '3min', '4min', '5min', '6min', '7min', '8min'],
+            datasets: [{
+                label: 'Vitesse (km/h)',
+                data: chartData,
+                // Couleur de la ligne (Bleu standard Bootstrap)
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)', // Légère teinte bleue sous la ligne
+                borderWidth: 3,
+                tension: 0.4, // Courbe arrondie
+                pointRadius: 3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { 
+                    grid: { color: gridColor }, // Utilise la couleur adaptative
+                    ticks: { color: textColor } // Utilise la couleur adaptative
+                }, 
+                x: { 
+                    grid: { color: gridColor }, // Utilise la couleur adaptative
+                    ticks: { color: textColor } // Utilise la couleur adaptative
+                }
+            },
+            plugins: { 
+                legend: { 
+                    display: true,
+                    labels: { color: textColor } // Légende adaptative
+                } 
+            }
+        }
+    });
+</script>
+{% endblock %}

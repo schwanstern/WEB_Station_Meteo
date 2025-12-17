@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">Tableau de bord instantané</h2>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Température</h5>
+                <div style="height:150px; position:relative;">
+                    <canvas id="tempChart"></canvas>
+                    <div style="position:absolute; top:60%; left:0; right:0; font-size:1.5em; font-weight:bold;">
+                        {{ data.temperature }}°C
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted mb-3">Direction Vent</h5>
+                <div class="compass-container">
+                    <span class="compass-label label-n">N</span>
+                    <span class="compass-label label-e">E</span>
+                    <span class="compass-label label-s">S</span>
+                    <span class="compass-label label-w">W</span>
+                    <div class="compass-needle" id="needle"></div>
+                    <div class="compass-center"></div>
+                </div>
+                <div class="mt-3">
+                    <h2 class="fw-bold">{{ data.vent_dir }}</h2>
+                    <small class="text-muted">{{ data.vent_angle }}°</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setCompassAngle({{ data.vent_angle }});
+        
+        createGauge('tempChart', {{ data.temperature }}, 50, '#e74c3c');
+        createGauge('humChart', {{ data.humidite }}, 100, '#3498db');
+        createGauge('windChart', {{ data.vent_vitesse }}, 100, '#adb5bd'); // Gris moyen pour le vent
+        createGauge('pressChart', {{ data.pression }} - 900, 150, '#2ecc71');
+        createGauge('luxChart', {{ data.luminosite }}, 1000, '#f1c40f');
+    });
+</script>
+{% endblock %}
