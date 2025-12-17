@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    /* --- CSS BOUSSOLE AVEC VARIABLES BOOTSTRAP --- */
+    /* Plus aucune couleur fixe (#000 ou #FFF), on utilise var(--bs-...) */
+    .compass-container {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin: 0 auto;
+        
+        /* C'est ici que la magie opère : */
+        border: 4px solid var(--bs-border-color);       /* Bordure adaptative */
+        background: var(--bs-body-bg);                  /* Fond adaptatif */
+        box-shadow: inset 0 0 20px var(--bs-secondary-bg); /* Ombre interne adaptative */
+        
+        transition: all 0.3s ease;
+    }
+
+    .compass-label {
+        position: absolute;
+        font-weight: bold;
+        font-size: 0.9em;
+        color: var(--bs-body-color); /* Texte adaptatif (Noir/Blanc) */
+    }
+    
+    /* Le Nord reste rouge, c'est une convention */
+    .label-n { top: 5px; left: 50%; transform: translateX(-50%); color: #e74c3c; }
+    .label-s { bottom: 5px; left: 50%; transform: translateX(-50%); }
+    .label-e { right: 10px; top: 50%; transform: translateY(-50%); }
+    .label-w { left: 10px; top: 50%; transform: translateY(-50%); }
+
+    .compass-needle {
+        position: absolute;
+        top: 50%; left: 50%; width: 6px; height: 100px;
+        transform-origin: center center; 
+        margin-top: -50px; margin-left: -3px;
+        transition: transform 1s cubic-bezier(0.4, 2.5, 0.6, 0.5);
+    }
+
+    .compass-needle::before {
+        content: ''; position: absolute; top: 10px; left: -5px;
+        border-left: 8px solid transparent; border-right: 8px solid transparent;
+        border-bottom: 50px solid #e74c3c; /* Pointe Rouge */
+    }
+    .compass-needle::after {
+        content: ''; position: absolute; bottom: 10px; left: -5px;
+        border-left: 8px solid transparent; border-right: 8px solid transparent;
+        /* Queue : utilise la couleur secondaire (gris clair ou foncé selon le mode) */
+        border-top: 50px solid var(--bs-secondary-color); 
+    }
+    
+    .compass-center {
+        position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
+        background: var(--bs-body-color); /* Centre adaptatif */
+        border-radius: 50%; transform: translate(-50%, -50%); z-index: 10;
+        box-shadow: 0 0 2px var(--bs-border-color);
+    }
+</style>
+
+<h2 class="mb-4">Tableau de bord instantané</h2>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Température</h5>
+                <div style="height:150px; position:relative;">
+                    <canvas id="tempChart"></canvas>
+                    <div style="position:absolute; top:60%; left:0; right:0; text-align:center; font-size:1.5em; font-weight:bold;">
+                        {{ data.temperature }}°C
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Humidité</h5>
+                <div style="height:150px; position:relative;">
+                    <canvas id="humChart"></canvas>
+                    <div style="position:absolute; top:60%; left:0; right:0; text-align:center; font-size:1.5em; font-weight:bold;">
+                        {{ data.humidite }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Vitesse Vent</h5>
+                <div style="height:150px; position:relative;">
+                    <canvas id="windChart"></canvas>
+                    <div style="position:absolute; top:60%; left:0; right:0; text-align:center; font-size:1.5em; font-weight:bold;">
+                        {{ data.vent_vitesse }} km/h
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted mb-3">Direction Vent</h5>
+                
+                <div class="compass-container">
+                    <span class="compass-label label-n">N</span>
+                    <span class="compass-label label-e">E</span>
+                    <span class="compass-label label-s">S</span>
+                    <span class="compass-label label-w">W</span>
+                    
+                    <div class="compass-needle" id="needle"></div>
+                    <div class="compass-center"></div>
+                </div>
+
+                <div class="mt-3">
+                    <h2 class="fw-bold">{{ data.vent_dir }}</h2>
+                    <small class="text-muted">{{ data.vent_angle }}°</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Pression (hPa)</h5>
+                <div style="height:150px; position:relative;">
+                    <canvas id="pressChart"></canvas>
+                    <div style="position:absolute; top:60%; left:0; right:0; text-align:center; font-size:1.5em; font-weight:bold;">
+                        {{ data.pression }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Luminosité (Lux)</h5>
+                <div style="height:150px; position:relative;">
+                    <canvas id="luxChart"></canvas>
+                    <div style="position:absolute; top:60%; left:0; right:0; text-align:center; font-size:1.5em; font-weight:bold;">
+                        {{ data.luminosite }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- L'ASTUCE JS POUR BOOTSTRAP ---
+    // On va chercher la couleur directement dans les variables calculées du navigateur
+    // Ainsi, Chart.js utilisera la "couleur système" actuelle
+    const styles = getComputedStyle(document.body);
+    const colorEmpty = styles.getPropertyValue('--bs-secondary-bg') || '#eee'; 
+    // ^ Si on est en dark, ça prendra un gris foncé, si light, un gris clair.
+
+    // --- PARTIE BOUSSOLE ---
+    const angleVent = {{ data.vent_angle }};
+    const needle = document.getElementById('needle');
+    needle.style.transform = `rotate(${angleVent}deg)`;
+
+    // --- PARTIE JAUGES ---
+    function createGauge(ctxId, value, max, color) {
+        const ctx = document.getElementById(ctxId).getContext('2d');
+        const remaining = max - value;
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ["Valeur", "Reste"],
+                datasets: [{
+                    data: [value, remaining],
+                    backgroundColor: [color, colorEmpty], // On utilise la variable CSS récupérée
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                rotation: -90, circumference: 180, cutout: '70%',
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            }
+        });
+    }
+
+    createGauge('tempChart', {{ data.temperature }}, 50, '#e74c3c');
+    createGauge('humChart', {{ data.humidite }}, 100, '#3498db');
+    createGauge('windChart', {{ data.vent_vitesse }}, 100, '#adb5bd'); // Gris moyen pour le vent
+    createGauge('pressChart', {{ data.pression }} - 900, 150, '#2ecc71');
+    createGauge('luxChart', {{ data.luminosite }}, 1000, '#f1c40f');
+</script>
+{% endblock %}
