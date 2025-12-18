@@ -118,6 +118,23 @@ def login_view(request):
                 return redirect("accueil")
             else:
                 messages.error(request, "Email/Utilisateur ou mot de passe incorrect")
+        elif action == "register":
+            username = request.POST.get("identifiant")
+            email = request.POST.get("email")
+            password = request.POST.get("mdp")
+
+            if User.objects.filter(username=username).exists():
+                messages.error(request, "Ce nom d'utilisateur est déjà pris.")
+
+            elif User.objects.filter(email=email).exists():
+                messages.error(request, "Cet email est déjà utilisé.")
+
+            else:
+                User.objects.create_user(
+                    username=username, email=email, password=password
+                )
+
+                messages.success(request, "Compte créé avec succès ! Connectez-vous.")
 
     return render(request, "login.html")
 
