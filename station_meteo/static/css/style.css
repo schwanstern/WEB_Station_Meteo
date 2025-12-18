@@ -99,6 +99,16 @@ body {
     color: #0d6efd;
 }
 
+.input-group .btn {
+    border-color: var(--bs-border-color);
+    z-index: 0;
+}
+
+.input-group .form-control:focus {
+    z-index: 1;
+    /* Le champ passe au-dessus de la bordure du bouton au focus */
+}
+
 /* État actif de l'onglet */
 .nav-link-custom.active-tab {
     border-bottom: 3px solid #0d6efd;

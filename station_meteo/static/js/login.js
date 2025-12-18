@@ -73,36 +73,23 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 });
 
-function showLogin() {
-    const mainForm = document.getElementById('mainForm');
-    const forgotForm = document.getElementById('forgotForm');
-    const authTabs = document.getElementById('authTabs');
-    const tabLogin = document.getElementById('tab-login');
-    const tabRegister = document.getElementById('tab-register');
+function togglePassword() {
+    const passwordInput = document.getElementById('passwordInput');
+    const passwordIcon = document.getElementById('passwordIcon');
 
-    if (!mainForm) return;
+    if (!passwordInput || !passwordIcon) return;
 
-    // Affichage
-    mainForm.style.display = 'flex';
-    forgotForm.style.display = 'none';
-    authTabs.style.visibility = 'visible';
-
-    // Contenu
-    document.getElementById('form-action').value = "login";
-    document.getElementById('btn-submit').innerText = "Connexion";
-
-    // Champs
-    document.getElementById('field-email').style.display = 'none';
-    document.querySelector('input[name="email"]').required = false;
-    document.getElementById('link-forgot').style.display = 'flex';
-
-    // Textes bas
-    document.getElementById('bottom-text-login').style.display = 'block';
-    document.getElementById('bottom-text-register').style.display = 'none';
-
-    // Onglets (Classes Bootstrap standard + notre CSS)
-    tabLogin.classList.add('active');
-    tabRegister.classList.remove('active');
+    if (passwordInput.type === "password") {
+        // On montre le mot de passe
+        passwordInput.type = "text";
+        passwordIcon.classList.remove('bi-eye');
+        passwordIcon.classList.add('bi-eye-slash'); // Oeil barré
+    } else {
+        // On cache le mot de passe
+        passwordInput.type = "password";
+        passwordIcon.classList.remove('bi-eye-slash');
+        passwordIcon.classList.add('bi-eye'); // Oeil normal
+    }
 }
 
 function showRegister() {
