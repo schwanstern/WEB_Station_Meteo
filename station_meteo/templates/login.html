@@ -1,92 +1,101 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
 <div class="container d-flex justify-content-center align-items-center h-100">
-    
-    <div class="card shadow-lg rounded-4" style="width: 450px; height: 680px; border: 1px solid var(--bs-border-color);">
-        <div class="card-body p-4 d-flex flex-column">
-            
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                <div style="position: absolute; top: -60px; left: 0; width: 100%;">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} py-2 text-center shadow rounded-pill">{{ message }}</div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            {% endwith %}
+
+    <div class="card shadow-lg rounded-4 auth-card">
+        <div class="card-body p-4 d-flex flex-column position-relative">
+
+            {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} py-2 text-center shadow rounded-pill">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
 
             <div class="text-center mb-4 mt-2">
                 <div class="mb-2">
-                    <i class="bi bi-cloud-sun-fill" style="font-size: 3.5rem; color: #ffce00; text-shadow: 2px 2px 0px #0d6efd;"></i>
-                    </div>
+                    <i class="bi bi-cloud-sun-fill weather-icon"></i>
+                </div>
                 <h3 class="fw-bold" style="color: var(--bs-body-color);">Station Météo</h3>
             </div>
 
             <ul class="nav nav-tabs nav-fill mb-4 border-bottom-0" id="authTabs">
                 <li class="nav-item">
-                    <a class="nav-link active fw-bold" href="#" id="tab-login" onclick="showLogin()" 
-                       style="border:none; border-bottom: 3px solid #0d6efd; color: #0d6efd; background: transparent;">Connexion</a>
+                    <a class="nav-link nav-link-custom active-tab" href="#" id="tab-login"
+                        onclick="showLogin()">Connexion</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-muted" href="#" id="tab-register" onclick="showRegister()" 
-                       style="border:none; border-bottom: 3px solid transparent; background: transparent;">Inscription</a>
+                    <a class="nav-link nav-link-custom text-muted" href="#" id="tab-register"
+                        onclick="showRegister()">Inscription</a>
                 </li>
             </ul>
 
             <form method="POST" id="mainForm" class="d-flex flex-column flex-grow-1">
+                {% csrf_token %}
                 <input type="hidden" name="action" id="form-action" value="login">
-                
-                <div style="height: 320px; display: flex; flex-direction: column; justify-content: flex-start;">
-                    
+
+                <div class="form-content-area">
+
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-secondary small">Utilisateur / Email</label>
-                        <input type="text" name="user" class="form-control form-control-lg rounded-3" style="font-size: 1rem;" required>
+                        <input type="text" name="identifiant" class="form-control form-control-lg rounded-3 fs-6"
+                            required>
                     </div>
 
                     <div class="mb-3" id="field-email" style="display: none;">
                         <label class="form-label fw-semibold text-secondary small">Adresse Email</label>
-                        <input type="email" name="email" class="form-control form-control-lg rounded-3" style="font-size: 1rem;">
+                        <input type="email" name="email" class="form-control form-control-lg rounded-3 fs-6">
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-secondary small">Mot de passe</label>
-                        <input type="password" name="mdp" class="form-control form-control-lg rounded-3" style="font-size: 1rem;" required>
+                        <input type="password" name="mdp" class="form-control form-control-lg rounded-3 fs-6" required>
                     </div>
 
                     <div class="d-flex justify-content-end" id="link-forgot">
-                        <a href="#" onclick="showForgot()" class="text-decoration-none small text-primary fw-semibold">Mot de passe oublié ?</a>
+                        <a href="#" onclick="showForgot()"
+                            class="text-decoration-none small text-primary fw-semibold">Mot de passe oublié ?</a>
                     </div>
                 </div>
 
                 <div class="mt-auto text-center">
-                    <button type="submit" class="btn btn-primary w-100 btn-lg rounded-3 fw-bold mb-3" id="btn-submit" style="background-color: #1a56db; border-color: #1a56db;">Connexion</button>
-                    
+                    <button type="submit" class="btn btn-primary w-100 btn-lg rounded-3 fw-bold mb-3 btn-auth"
+                        id="btn-submit">Connexion</button>
+
                     <p class="small text-muted" id="bottom-text-login">
-                        Pas encore de compte ? <a href="#" onclick="showRegister()" class="text-decoration-none fw-bold text-primary">Inscrivez-vous</a>
+                        Pas encore de compte ? <a href="#" onclick="showRegister()"
+                            class="text-decoration-none fw-bold text-primary">Inscrivez-vous</a>
                     </p>
                     <p class="small text-muted" id="bottom-text-register" style="display:none;">
-                        Déjà un compte ? <a href="#" onclick="showLogin()" class="text-decoration-none fw-bold text-primary">Connectez-vous</a>
+                        Déjà un compte ? <a href="#" onclick="showLogin()"
+                            class="text-decoration-none fw-bold text-primary">Connectez-vous</a>
                     </p>
                 </div>
             </form>
 
-            <form method="POST" id="forgotForm" style="display: none; height: 100%; flex-direction: column;">
+            <form method="POST" id="forgotForm" class="forgot-container">
                 <input type="hidden" name="action" value="reset_password">
-                
+
                 <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
                     <h4 class="text-center fw-bold mb-3">Réinitialisation</h4>
                     <p class="text-center text-muted small mb-4">Entrez votre email pour recevoir un lien.</p>
-                    
+
                     <div class="mb-4">
                         <label class="form-label fw-semibold text-secondary small">Adresse Email</label>
                         <input type="email" name="email" class="form-control form-control-lg rounded-3">
                     </div>
                 </div>
-                
+
                 <div class="mt-auto text-center">
-                     <button type="submit" class="btn btn-warning w-100 btn-lg rounded-3 text-white fw-bold mb-3">Envoyer</button>
-                     <a href="#" onclick="showLogin()" class="text-decoration-none small text-muted">Retour à la connexion</a>
+                    <button type="submit"
+                        class="btn btn-warning w-100 btn-lg rounded-3 text-white fw-bold mb-3">Envoyer</button>
+                    <a href="#" onclick="showLogin()" class="text-decoration-none small text-muted">Retour à la
+                        connexion</a>
                 </div>
             </form>
 
@@ -94,79 +103,5 @@
     </div>
 </div>
 
-<script>
-    // Éléments du DOM
-    const mainForm = document.getElementById('mainForm');
-    const forgotForm = document.getElementById('forgotForm');
-    
-    const fieldEmail = document.getElementById('field-email');
-    const linkForgot = document.getElementById('link-forgot');
-    
-    const formAction = document.getElementById('form-action');
-    const btnSubmit = document.getElementById('btn-submit');
-    
-    const tabLogin = document.getElementById('tab-login');
-    const tabRegister = document.getElementById('tab-register');
-    const tabs = document.getElementById('authTabs');
-
-    const bottomTextLogin = document.getElementById('bottom-text-login');
-    const bottomTextRegister = document.getElementById('bottom-text-register');
-
-    // Styles (Ligne bleue vs Ligne transparente)
-    const activeStyle = "border:none; border-bottom: 3px solid #0d6efd; color: #0d6efd; background: transparent;";
-    const inactiveStyle = "border:none; border-bottom: 3px solid transparent; color: var(--bs-secondary-color); background: transparent;";
-
-    function showLogin() {
-        mainForm.style.display = 'flex';
-        forgotForm.style.display = 'none';
-        tabs.style.visibility = 'visible';
-
-        formAction.value = "login";
-        btnSubmit.innerText = "Connexion"; // Texte exact de la photo
-        
-        // Gestion des champs
-        fieldEmail.style.display = 'none';
-        document.querySelector('input[name="email"]').required = false;
-        linkForgot.style.display = 'flex';
-
-        // Gestion du texte en bas
-        bottomTextLogin.style.display = 'block';
-        bottomTextRegister.style.display = 'none';
-
-        // Styles des onglets
-        tabLogin.className = "nav-link active fw-bold";
-        tabLogin.style = activeStyle;
-        tabRegister.className = "nav-link";
-        tabRegister.style = inactiveStyle;
-    }
-
-    function showRegister() {
-        mainForm.style.display = 'flex';
-        forgotForm.style.display = 'none';
-        
-        formAction.value = "register";
-        btnSubmit.innerText = "S'inscrire"; // Adapte le bouton
-
-        // Gestion des champs
-        fieldEmail.style.display = 'block';
-        document.querySelector('input[name="email"]').required = true;
-        linkForgot.style.display = 'none';
-
-        // Gestion du texte en bas
-        bottomTextLogin.style.display = 'none';
-        bottomTextRegister.style.display = 'block';
-
-        // Styles des onglets
-        tabRegister.className = "nav-link active fw-bold";
-        tabRegister.style = activeStyle;
-        tabLogin.className = "nav-link";
-        tabLogin.style = inactiveStyle;
-    }
-
-    function showForgot() {
-        mainForm.style.display = 'none';
-        forgotForm.style.display = 'flex';
-        tabs.style.visibility = 'hidden';
-    }
-</script>
+<script src="{% static 'js/login.js' %}"></script>
 {% endblock %}
