@@ -79,8 +79,10 @@ def get_alerts_logic():  # J'ai renommé légèrement pour éviter les confusion
 
 
 def root(request):
-    # En Django, on utilise le nom de la route (voir urls.py plus bas)
-    return redirect("login")
+    if request.user.is_authenticated:
+        return redirect("accueil")
+    else:
+        return redirect("login")
 
 
 def login_view(request):
@@ -152,4 +154,4 @@ def settings(request):
 def logout_view(request):
     logout(request)  # Détruit la session
     messages.success(request, "Vous avez été déconnecté.")
-    return redirect("login.html")
+    return redirect("login")
