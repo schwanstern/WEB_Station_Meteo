@@ -1,83 +1,69 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block content %}
+
+{{ datasets|json_script:"my-data" }}
+{{ labels|json_script:"my-labels" }}
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div class="btn-group" role="group">
-        <button type="button" class="btn btn-primary">Vitesse vent</button>
-        <button type="button" class="btn btn-outline-secondary">Température</button>
-        <button type="button" class="btn btn-outline-secondary">Humidité</button>
-        <button type="button" class="btn btn-outline-secondary">Pression</button>
+        <button type="button" class="btn btn-primary" id="btn-vent" onclick="toggleData('vent')">Vitesse vent</button>
+        <button type="button" class="btn btn-outline-secondary" id="btn-temp"
+            onclick="toggleData('temp')">Température</button>
+        <button type="button" class="btn btn-outline-secondary" id="btn-hum"
+            onclick="toggleData('hum')">Humidité</button>
+        <button type="button" class="btn btn-outline-secondary" id="btn-press"
+            onclick="toggleData('press')">Pression</button>
+        <button type="button" class="btn btn-outline-secondary" id="btn-lux"
+            onclick="toggleData('lux')">Luminosité</button>
     </div>
 
-    <div>
-        <select class="form-select" style="min-width: 150px;">
-            <option>Dernières 5min</option>
-            <option>Dernière heure</option>
-            <option>24 Heures</option>
-        </select>
+    <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" type="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-clock-history"></i>
+            <span id="period-label">{{ period_label }}</span>
+        </button>
+
+        <div class="dropdown-menu dropdown-menu-end p-0 shadow" style="min-width: 300px;">
+            <div class="d-flex">
+                <div class="p-2 border-end">
+                    <h6 class="dropdown-header">Minutes</h6>
+                    <a href="?period=5m"
+                        class="dropdown-item {% if current_period == '5m' %}active{% endif %}">Dernières 5 min</a>
+                    <a href="#" class="dropdown-item disabled">Dernières 15 min</a>
+                </div>
+
+                <div class="p-2 border-end">
+                    <h6 class="dropdown-header">Heures</h6>
+                    <a href="?period=1h" class="dropdown-item {% if current_period == '1h' %}active{% endif %}">Dernière
+                        heure</a>
+                    <a href="?period=24h"
+                        class="dropdown-item {% if current_period == '24h' %}active{% endif %}">Dernières 24 heures</a>
+                </div>
+
+                <div class="p-2">
+                    <h6 class="dropdown-header">Jours</h6>
+                    <a href="?period=7d" class="dropdown-item {% if current_period == '7d' %}active{% endif %}">7
+                        derniers jours</a>
+                </div>
+            </div>
+            <div class="border-top p-2 text-center bg-body-tertiary">
+                <small class="text-muted">Plage personnalisée (Bientôt)</small>
+            </div>
+        </div>
     </div>
 </div>
 
 <div class="card shadow-sm h-100">
     <div class="card-body">
-        <h5 class="card-title text-muted mb-4">Historique</h5>
+        <h5 class="card-title text-muted mb-4">Comparateur Historique</h5>
         <div style="height: 400px; width: 100%;">
             <canvas id="meteoChart"></canvas>
         </div>
     </div>
 </div>
 
-<script>
-    const ctx = document.getElementById('meteoChart').getContext('2d');
-    
-    // --- PARTIE MAGIQUE : Récupération des couleurs du thème ---
-    // On lit les variables CSS définies par Bootstrap (Dark ou Light)
-    const styles = getComputedStyle(document.body);
-    
-    // Couleur du texte (Noir en light, Blanc en dark)
-    const textColor = styles.getPropertyValue('--bs-body-color');
-    // Couleur des grilles/bordures (Gris clair en light, Gris foncé en dark)
-    const gridColor = styles.getPropertyValue('--bs-border-color');
-
-    // Données (Simulées ou venant de Python)
-    const chartData = {{ data | default([]) | tojson }}; 
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['1min', '2min', '3min', '4min', '5min', '6min', '7min', '8min'],
-            datasets: [{
-                label: 'Vitesse (km/h)',
-                data: chartData,
-                // Couleur de la ligne (Bleu standard Bootstrap)
-                borderColor: '#0d6efd',
-                backgroundColor: 'rgba(13, 110, 253, 0.1)', // Légère teinte bleue sous la ligne
-                borderWidth: 3,
-                tension: 0.4, // Courbe arrondie
-                pointRadius: 3,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: { 
-                    grid: { color: gridColor }, // Utilise la couleur adaptative
-                    ticks: { color: textColor } // Utilise la couleur adaptative
-                }, 
-                x: { 
-                    grid: { color: gridColor }, // Utilise la couleur adaptative
-                    ticks: { color: textColor } // Utilise la couleur adaptative
-                }
-            },
-            plugins: { 
-                legend: { 
-                    display: true,
-                    labels: { color: textColor } // Légende adaptative
-                } 
-            }
-        }
-    });
-</script>
+<script src="{% static 'js/graph.js' %}"></script>
 {% endblock %}

@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from django.urls import reverse
+import random
 
 # --- 1. Tes Variables & Fonctions (Copiées-collées de Flask) ---
 
@@ -28,7 +29,7 @@ def get_sensor_data():
     angle = mapping_direction.get(direction_texte, 0)
 
     return {
-        "vent_vitesse": 15,
+        "vent_vitesse": 25,
         "vent_dir": direction_texte,
         "vent_angle": angle,
         "temperature": 22.5,
@@ -160,8 +161,44 @@ def apercu(request):
 
 
 def graph(request):
-    data = [5, 12, 19, 15, 22, 28, 24, 20]
-    return render(request, "graph.html", {"data": data})
+    # 1. On récupère la période demandée dans l'URL (par défaut '1h')
+    period = request.GET.get("period", "1h")
+
+    # 2. Configuration des labels (Axe X) et du nombre de points selon la période
+    if period == "5m":
+        labels = ["T-5", "T-4", "T-3", "T-2", "T-1", "Maintenant"]
+        points = 6
+        titre_periode = "Dernières 5 minutes"
+    elif period == "24h":
+        labels = [f"{i}h" for i in range(0, 25, 2)]  # 0h, 2h, 4h...
+        points = 13
+        titre_periode = "Dernières 24 heures"
+    elif period == "7d":
+        labels = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
+        points = 7
+        titre_periode = "7 derniers jours"
+    else:  # Default '1h'
+        labels = ["0min", "10min", "20min", "30min", "40min", "50min", "60min"]
+        points = 7
+        titre_periode = "Dernière heure"
+
+    # 3. Génération de données aléatoires (Simulation)
+    datasets = {
+        "vent": [random.randint(5, 30) for _ in range(points)],
+        "temp": [random.randint(15, 25) for _ in range(points)],
+        "hum": [random.randint(40, 80) for _ in range(points)],
+        "press": [random.randint(1010, 1020) for _ in range(points)],
+        "lux": [random.randint(0, 1000) for _ in range(points)],
+    }
+
+    context = {
+        "datasets": datasets,
+        "labels": labels,  # On passe les labels au template
+        "current_period": period,  # Pour savoir quel bouton activer
+        "period_label": titre_periode,
+    }
+
+    return render(request, "graph.html", context)
 
 
 def settings(request):
