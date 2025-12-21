@@ -6,60 +6,81 @@
 {{ datasets|json_script:"my-data" }}
 {{ labels|json_script:"my-labels" }}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-primary" id="btn-vent" onclick="toggleData('vent')">Vitesse vent</button>
-        <button type="button" class="btn btn-outline-secondary" id="btn-temp"
-            onclick="toggleData('temp')">Température</button>
-        <button type="button" class="btn btn-outline-secondary" id="btn-hum"
-            onclick="toggleData('hum')">Humidité</button>
-        <button type="button" class="btn btn-outline-secondary" id="btn-press"
-            onclick="toggleData('press')">Pression</button>
-        <button type="button" class="btn btn-outline-secondary" id="btn-lux"
-            onclick="toggleData('lux')">Luminosité</button>
+<div class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
+    <div class="inline-flex rounded-md shadow-sm" role="group">
+        <button type="button" id="btn-vent" onclick="toggleData('vent')"
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-l-lg hover:bg-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-white transition-colors">
+            Vitesse vent
+        </button>
+        <button type="button" id="btn-temp" onclick="toggleData('temp')"
+            class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white transition-colors">
+            Température
+        </button>
+        <button type="button" id="btn-hum" onclick="toggleData('hum')"
+            class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-r border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white transition-colors">
+            Humidité
+        </button>
+        <button type="button" id="btn-press" onclick="toggleData('press')"
+            class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white transition-colors">
+            Pression
+        </button>
+        <button type="button" id="btn-lux" onclick="toggleData('lux')"
+            class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white transition-colors">
+            Luminosité
+        </button>
     </div>
 
-    <div class="dropdown">
-        <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" type="button"
-            data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-clock-history"></i>
+    <div class="relative group">
+        <button
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 transition-colors">
+            <i class="bi bi-clock-history mr-2"></i>
             <span id="period-label">{{ period_label }}</span>
         </button>
 
-        <div class="dropdown-menu dropdown-menu-end p-0 shadow" style="min-width: 300px;">
-            <div class="d-flex">
-                <div class="p-2 border-end">
-                    <h6 class="dropdown-header">Minutes</h6>
+        <!-- Dropdown menu -->
+        <div
+            class="hidden group-hover:block absolute right-0 z-10 mt-0 w-80 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-200 dark:border-gray-700">
+            <div class="flex flex-row">
+                <div class="flex-1 p-2 border-r border-gray-200 dark:border-gray-700">
+                    <h6
+                        class="px-2 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                        Minutes</h6>
                     <a href="?period=5m"
-                        class="dropdown-item {% if current_period == '5m' %}active{% endif %}">Dernières 5 min</a>
-                    <a href="#" class="dropdown-item disabled">Dernières 15 min</a>
+                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-md {% if current_period == '5m' %}bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200{% endif %}">Dernières
+                        5 min</a>
+                    <span class="block px-4 py-2 text-sm text-gray-400 cursor-not-allowed">Dernières 15 min</span>
                 </div>
-
-                <div class="p-2 border-end">
-                    <h6 class="dropdown-header">Heures</h6>
-                    <a href="?period=1h" class="dropdown-item {% if current_period == '1h' %}active{% endif %}">Dernière
+                <div class="flex-1 p-2 border-r border-gray-200 dark:border-gray-700">
+                    <h6
+                        class="px-2 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                        Heures</h6>
+                    <a href="?period=1h"
+                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-md {% if current_period == '1h' %}bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200{% endif %}">Dernière
                         heure</a>
                     <a href="?period=24h"
-                        class="dropdown-item {% if current_period == '24h' %}active{% endif %}">Dernières 24 heures</a>
-                </div>
-
-                <div class="p-2">
-                    <h6 class="dropdown-header">Jours</h6>
-                    <a href="?period=7d" class="dropdown-item {% if current_period == '7d' %}active{% endif %}">7
-                        derniers jours</a>
+                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-md {% if current_period == '24h' %}bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200{% endif %}">Dernières
+                        24h</a>
                 </div>
             </div>
-            <div class="border-top p-2 text-center bg-body-tertiary">
-                <small class="text-muted">Plage personnalisée (Bientôt)</small>
+            <div class="p-2 border-t border-gray-200 dark:border-gray-700">
+                <h6 class="px-2 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                    Jours</h6>
+                <a href="?period=7d"
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-md {% if current_period == '7d' %}bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200{% endif %}">7
+                    derniers jours</a>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-2 text-center">
+                <small class="text-gray-500 dark:text-gray-400">Plage personnalisée (Bientôt)</small>
             </div>
         </div>
     </div>
 </div>
 
-<div class="card shadow-sm h-100">
-    <div class="card-body">
-        <h5 class="card-title text-muted mb-4">Comparateur Historique</h5>
-        <div style="height: 400px; width: 100%;">
+<div
+    class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden h-full">
+    <div class="p-6">
+        <h5 class="text-gray-500 dark:text-gray-400 font-medium mb-6">Comparateur Historique</h5>
+        <div class="w-full h-96">
             <canvas id="meteoChart"></canvas>
         </div>
     </div>

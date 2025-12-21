@@ -89,15 +89,36 @@ function renderChart() {
 // 4. Fonction Toggle (disponible globalement pour le onclick HTML)
 window.toggleData = function (key) {
     const btn = document.getElementById('btn-' + key);
+    if (!btn) return;
+
+    // Définition exhaustive des classes pour les deux états (Light + Dark)
+    // Cela inclut les classes de base et les overrides dark mode
+    const activeClasses = [
+        'bg-blue-600', 'text-white', 'border-blue-600', 'hover:bg-blue-700',
+        'dark:bg-blue-600', 'dark:border-blue-600', 'dark:text-white' // Force active style in dark mode too
+    ];
+
+    const inactiveClasses = [
+        'bg-white', 'text-gray-900', 'border-gray-200', 'hover:bg-gray-100', 'hover:text-blue-700',
+        'dark:bg-gray-700', 'dark:text-white', 'dark:border-gray-600', 'dark:hover:bg-gray-600'
+    ];
+
+    // Helper: Remove BOTH sets of classes, then add the target set
+    // This ensures no conflicting classes remain
+    const updateClasses = (element, targetClasses) => {
+        element.classList.remove(...activeClasses);
+        element.classList.remove(...inactiveClasses);
+        element.classList.add(...targetClasses);
+    };
 
     if (activeKeys.has(key)) {
+        // Désactivation
         activeKeys.delete(key);
-        btn.classList.remove('btn-primary');
-        btn.classList.add('btn-outline-secondary');
+        updateClasses(btn, inactiveClasses);
     } else {
+        // Activation
         activeKeys.add(key);
-        btn.classList.remove('btn-outline-secondary');
-        btn.classList.add('btn-primary');
+        updateClasses(btn, activeClasses);
     }
 
     renderChart();

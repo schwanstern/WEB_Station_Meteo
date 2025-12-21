@@ -1,12 +1,38 @@
-// Applique le thème au chargement
-(function() {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-bs-theme', savedTheme);
+/**
+ * theme.js
+ * Gère le basculement Dark/Light mode avec Tailwind CSS.
+ * Utilise localStorage pour persister le choix.
+ */
+
+// Au chargement ou immédiatement pour éviter le flash
+(function () {
+    if (localStorage.theme === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
 })();
 
 function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-bs-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-bs-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
+    if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+    } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+    }
+
+    // Si on est sur la page settings, on met à jour le switch
+    const switchEl = document.getElementById('themeSwitch');
+    if (switchEl) {
+        switchEl.checked = document.documentElement.classList.contains('dark');
+    }
 }
+
+// Initialisation du switch settings s'il existe
+document.addEventListener('DOMContentLoaded', () => {
+    const switchEl = document.getElementById('themeSwitch');
+    if (switchEl) {
+        switchEl.checked = document.documentElement.classList.contains('dark');
+    }
+});
