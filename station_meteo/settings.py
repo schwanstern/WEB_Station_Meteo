@@ -124,3 +124,10 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+# InfluxDB Configuration (v1.8)
+INFLUXDB_HOST = os.environ.get("INFLUXDB_HOST", "192.168.1.59")
+INFLUXDB_PORT = int(os.environ.get("INFLUXDB_PORT", 8086))
+INFLUXDB_USER = os.environ.get("INFLUXDB_USER", "root")
+INFLUXDB_PASSWORD = os.environ.get("INFLUXDB_PASSWORD", "root")
+INFLUXDB_DB = os.environ.get("INFLUXDB_DB", "meteo")
