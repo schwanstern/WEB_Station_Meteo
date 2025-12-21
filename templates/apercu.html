@@ -6,6 +6,21 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
+    <!-- Vitesse Vent -->
+    <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm text-center border border-gray-100 dark:border-gray-700 flex flex-col h-full">
+        <div class="p-6 flex-grow">
+            <h5 class="text-gray-500 dark:text-gray-400 font-medium mb-2">Vitesse Vent</h5>
+            <div style="height:150px; position:relative;">
+                <canvas id="windChart"></canvas>
+                <div
+                    class="absolute inset-x-0 bottom-0 top-[60%] text-center text-2xl font-bold text-gray-800 dark:text-white">
+                    {{ data.vent_vitesse }} km/h
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Température -->
     <div
         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm text-center border border-gray-100 dark:border-gray-700 flex flex-col h-full">
@@ -36,21 +51,6 @@
         </div>
     </div>
 
-    <!-- Vitesse Vent -->
-    <div
-        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm text-center border border-gray-100 dark:border-gray-700 flex flex-col h-full">
-        <div class="p-6 flex-grow">
-            <h5 class="text-gray-500 dark:text-gray-400 font-medium mb-2">Vitesse Vent</h5>
-            <div style="height:150px; position:relative;">
-                <canvas id="windChart"></canvas>
-                <div
-                    class="absolute inset-x-0 bottom-0 top-[60%] text-center text-2xl font-bold text-gray-800 dark:text-white">
-                    {{ data.vent_vitesse }} km/h
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Direction Vent (Compass) -->
     <div
         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm text-center border border-gray-100 dark:border-gray-700 flex flex-col h-full">
@@ -63,14 +63,15 @@
                 <span class="compass-label label-s">S</span>
                 <span class="compass-label label-w">W</span>
 
+                <!-- Valeur centrale (Angle) -->
+                <div class="compass-value">{{ data.vent_angle }}°</div>
+
                 <div class="compass-needle" id="needle"></div>
                 <div class="compass-center"></div>
             </div>
 
-            <div class="mt-4">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{ data.vent_dir }}</h2>
-                <small class="text-gray-500 dark:text-gray-400">{{ data.vent_angle }}°</small>
-            </div>
+            <!-- Plus de texte en dessous -->
+            <div class="mt-4 h-6"></div>
         </div>
     </div>
 
