@@ -115,13 +115,16 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 # InfluxDB Configuration (v1.8)
-INFLUXDB_HOST = os.environ.get("INFLUXDB_HOST", "192.168.1.59")
-INFLUXDB_PORT = int(os.environ.get("INFLUXDB_PORT", 8086))
-INFLUXDB_USER = os.environ.get("INFLUXDB_USER", "root")
-INFLUXDB_PASSWORD = os.environ.get("INFLUXDB_PASSWORD", "root")
-INFLUXDB_DB = os.environ.get("INFLUXDB_DB", "meteo")
+INFLUXDB_URL = "http://influxdb:8086"  # Nom du service docker + port
+INFLUXDB_TOKEN = os.environ.get('DOCKER_INFLUXDB_INIT_ADMIN_TOKEN')
+INFLUXDB_ORG = os.environ.get('DOCKER_INFLUXDB_INIT_ORG')
+INFLUXDB_BUCKET = os.environ.get('DOCKER_INFLUXDB_INIT_BUCKET')
