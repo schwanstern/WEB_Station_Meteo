@@ -1,0 +1,128 @@
+/* 
+   style.css 
+   Nettoyé après migration Tailwind.
+*/
+
+/* Transition globale smooth pour le theme switch */
+body {
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* --- CSS BOUSSOLE ADAPTÉE TAILWIND --- */
+/* On utilise les variables CSS de Tailwind si possible ou des couleurs explicites */
+.compass-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: 0 auto;
+
+    border: 4px solid #e5e7eb;
+    /* gray-200 */
+    background: #ffffff;
+    box-shadow: inset 0 0 20px #f3f4f6;
+    /* gray-100 */
+
+    transition: all 0.3s ease;
+}
+
+/* Dark mode override via sélecteur parent .dark */
+.dark .compass-container {
+    border-color: #374151;
+    /* gray-700 */
+    background: #1f2937;
+    /* gray-800 */
+    box-shadow: inset 0 0 20px #111827;
+    /* gray-900 */
+}
+
+.compass-label {
+    position: absolute;
+    font-weight: bold;
+    font-size: 0.9em;
+    color: #374151;
+    /* gray-700 */
+}
+
+.dark .compass-label {
+    color: #d1d5db;
+    /* gray-300 */
+}
+
+.label-n {
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #dc2626;
+    /* red-600 */
+}
+
+.label-s {
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.label-e {
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.label-w {
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.compass-needle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 100px;
+    transform-origin: center center;
+    margin-top: -50px;
+    margin-left: -3px;
+    transition: transform 1s cubic-bezier(0.4, 2.5, 0.6, 0.5);
+}
+
+.compass-needle::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: -5px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 50px solid #dc2626;
+    /* red-600 */
+}
+
+.compass-needle::after {
+    content: '';
+    position: absolute;
+    bottom: 10px;
+    left: -5px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 50px solid #9ca3af;
+    /* gray-400 */
+}
+
+.compass-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    background: #374151;
+    /* gray-700 */
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    box-shadow: 0 0 2px #9ca3af;
+}
+
+.dark .compass-center {
+    background: #d1d5db;
+}
