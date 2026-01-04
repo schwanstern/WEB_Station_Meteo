@@ -1,5 +1,5 @@
 from django.conf import settings
-from influxdb import InfluxDBClient
+from influxdb_client import InfluxDBClient
 import logging
 import datetime
 
