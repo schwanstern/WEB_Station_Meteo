@@ -8,11 +8,9 @@ logger = logging.getLogger(__name__)
 def get_client():
     """Returns an authenticated InfluxDB client."""
     return InfluxDBClient(
-        host=settings.INFLUXDB_HOST,
-        port=settings.INFLUXDB_PORT,
-        username=settings.INFLUXDB_USER,
-        password=settings.INFLUXDB_PASSWORD,
-        database=settings.INFLUXDB_DB
+        url=settings.INFLUXDB_URL,
+        token=settings.INFLUXDB_TOKEN,
+        org=settings.INFLUXDB_ORG
     )
 
 def query_measurements(measurement="ttn_uplink_student", duration="1h"):
