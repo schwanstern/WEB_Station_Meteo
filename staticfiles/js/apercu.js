@@ -29,76 +29,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // mais Chart.js n'est pas réactif au CSS externe facilement sans plugin.
     // On va faire un check initial.
 
-    const styles = getComputedStyle(document.body);
     const isDark = document.documentElement.classList.contains('dark');
+    const colorEmpty = isDark ? '#111827' : '#f3f4f6';
 
-    // Récupération dynamique depuis le CSS
-    const colorEmpty = isDark ?
-        styles.getPropertyValue('--chart-empty-dark').trim() :
-        styles.getPropertyValue('--chart-empty-light').trim();
-
-    const colors = {
-        temp: styles.getPropertyValue('--chart-temp').trim(),
-        hum: styles.getPropertyValue('--chart-hum').trim(),
-        wind: styles.getPropertyValue('--chart-wind').trim(),
-        press: styles.getPropertyValue('--chart-press').trim(),
-        lux: styles.getPropertyValue('--chart-lux').trim()
-    };
-
-    // Scaling Logic:
-    // Temp: -10 to 40 (Range 50) -> offset +10
-    // Hum: 0 to 100
-    // Wind: 0 to 100
-    // Press: 960 to 1040 (Range 80) -> offset 960
-    // Lux: 0 to 1000
-
-    createGauge('tempChart', data.temperature + 10, 50, colors.temp, colorEmpty);
-    createGauge('humChart', data.humidite, 100, colors.hum, colorEmpty);
-    createGauge('windChart', data.vent_vitesse, 100, colors.wind, colorEmpty);
-    createGauge('pressChart', data.pression - 960, 80, colors.press, colorEmpty); // 960hPa min
-    createGauge('luxChart', data.luminosite, 2000, colors.lux, colorEmpty);
+    createGauge('tempChart', data.temperature, 50, '#ef4444', colorEmpty);
+    createGauge('humChart', data.humidite, 100, '#3b82f6', colorEmpty);
+    createGauge('windChart', data.vent_vitesse, 100, '#9ca3af', colorEmpty);
+    createGauge('pressChart', data.pression - 900, 150, '#22c55e', colorEmpty);
+    createGauge('luxChart', data.luminosite, 1000, '#eab308', colorEmpty);
 });
 
 function createGauge(ctxId, value, max, color, colorEmpty) {
     const canvas = document.getElementById(ctxId);
     if (!canvas) return;
 
-    // Clamp value logic
-    let displayValue = value;
-    if (displayValue < 0) displayValue = 0;
-    if (displayValue > max) displayValue = max;
-
-    // Safety check for invalid numbers (prevents chart crash)
-    if (isNaN(displayValue)) displayValue = 0;
-
     const ctx = canvas.getContext('2d');
-    const remaining = max - displayValue;
+    const remaining = Math.max(0, max - value);
 
     new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: ["Valeur", "Reste"],
             datasets: [{
-                data: [displayValue, remaining],
+                data: [value, remaining],
                 backgroundColor: [color, colorEmpty],
-                borderWidth: 0,
-                // Modern Touch: Rounded Ends
-                borderRadius: 20,
-                // Space between active and track
-                borderJoinStyle: 'round',
-                spacing: 2,
+                borderWidth: 0
             }]
         },
         options: {
             rotation: -90,
             circumference: 180,
-            cutout: '80%', // Thinner ring
+            cutout: '70%',
             responsive: true,
             maintainAspectRatio: false,
-            animation: {
-                animateScale: true,
-                animateRotate: true
-            },
             plugins: {
                 legend: { display: false },
                 tooltip: { enabled: false }
