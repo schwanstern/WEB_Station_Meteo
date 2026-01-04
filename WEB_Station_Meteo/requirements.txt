@@ -1,0 +1,17 @@
+asgiref==3.11.0
+certifi==2026.1.4
+Django==6.0
+gunicorn==23.0.0
+influxdb-client==1.49.0
+packaging==25.0
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.1
+reactivex==4.1.0
+setuptools==80.9.0
+six==1.17.0
+sqlparse==0.5.5
+typing_extensions==4.15.0
+urllib3==2.6.2
+psycopg2-binary
+requests
+requests

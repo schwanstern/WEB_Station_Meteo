@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Gestion du Système</h2>
+    <span class="px-2 py-1 text-xs font-semibold text-white bg-gray-500 rounded-md">v1.0.0</span>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full">
+        <div class="px-6 py-4 bg-gray-800 text-white border-b border-gray-600 font-semibold flex items-center">
+            <i class="bi bi-cpu mr-2"></i> État
+        </div>
+        <div class="p-6">
+            <ul class="divide-y divide-gray-100 dark:divide-gray-700">
+                <li class="py-3 flex justify-between items-center">
+                    <span class="text-gray-700 dark:text-gray-300">Statut Serveur</span>
+                    <span
+                        class="px-3 py-1 text-xs font-bold text-green-700 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-300">En
+                        ligne</span>
+                </li>
+                <li class="py-3 flex justify-between items-center">
+                    <span class="text-gray-700 dark:text-gray-300">Dernière mise à jour</span>
+                    <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.last_update }}</span>
+                </li>
+                <li class="py-3 flex justify-between items-center">
+                    <span class="text-gray-700 dark:text-gray-300">Connexion Base de données</span>
+                    <span
+                        class="px-3 py-1 text-xs font-bold text-green-700 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-300">OK</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border-0 border-t-4 {% if state.update_available %}border-blue-500{% else %}border-green-500{% endif %} overflow-hidden flex flex-col h-full">
+        <div class="p-6 text-center flex flex-col justify-center h-full">
+
+            {% if state.update_available %}
+            <i class="bi bi-cloud-arrow-down text-5xl text-blue-500 mb-4"></i>
+            <h4 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Mise à jour disponible</h4>
+            <p class="text-gray-500 dark:text-gray-400 mb-6">Une nouvelle version des drivers capteurs est prête.</p>
+
+            <form method="POST">
+                {% csrf_token %}
+                <!-- Added CSRF token just in case, though usually handled by middleware if not exempted -->
+                <input type="hidden" name="do_update" value="true">
+                <button type="submit"
+                    class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors">
+                    <i class="bi bi-download mr-2"></i> INSTALLER
+                </button>
+            </form>
+            {% else %}
+            <i class="bi bi-check-circle text-5xl text-green-500 mb-4"></i>
+            <h4 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Système à jour</h4>
+            <p class="text-gray-500 dark:text-gray-400 mb-6">Aucune action requise pour le moment.</p>
+            <button
+                class="inline-flex items-center px-6 py-3 bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 font-bold rounded-lg cursor-not-allowed"
+                disabled>Vérifier</button>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
