@@ -7,11 +7,25 @@ logger = logging.getLogger(__name__)
 
 def get_client():
     """Returns an authenticated InfluxDB client."""
-    return InfluxDBClient(
-        url=settings.INFLUXDB_URL,
-        token=settings.INFLUXDB_TOKEN,
-        org=settings.INFLUXDB_ORG
-    )
+    try:
+        # Check for missing settings
+        if not settings.INFLUXDB_URL:
+            logger.error("INFLUXDB_URL is not set.")
+        if not settings.INFLUXDB_TOKEN:
+            logger.error("INFLUXDB_TOKEN is not set.")
+        if not settings.INFLUXDB_ORG:
+            logger.error("INFLUXDB_ORG is not set.")
+            
+        return InfluxDBClient(
+            url=settings.INFLUXDB_URL,
+            token=settings.INFLUXDB_TOKEN,
+            org=settings.INFLUXDB_ORG
+        )
+    except Exception as e:
+        logger.error(f"Failed to initialize InfluxDBClient: {e}")
+        # Log values (be careful with token in prod, but needed for debug now)
+        logger.error(f"Config: URL={settings.INFLUXDB_URL}, ORG={settings.INFLUXDB_ORG}, TOKEN={'*' * 5 if settings.INFLUXDB_TOKEN else 'None'}")
+        raise e
 
 def query_measurements(measurement="ttn_uplink_student", duration="1h"):
     """
