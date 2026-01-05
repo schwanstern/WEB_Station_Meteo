@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 
 # Installation des dépendances système de base
-RUN apt-get update && apt-get install -y netcat-openbsd gcc libpq-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y netcat-openbsd gcc libpq-dev curl && rm -rf /var/lib/apt/lists/*
 
 # Installation des dépendances Python
 COPY requirements.txt /app/
