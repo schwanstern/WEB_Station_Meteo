@@ -20,8 +20,13 @@ services:
     volumes:
       - ./influxdb_data:/var/lib/influxdb2
       - ./influxdb_config:/etc/influxdb2
-    env_file:
-      - .env
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=${DOCKER_INFLUXDB_INIT_MODE}
+      - DOCKER_INFLUXDB_INIT_USERNAME=${DOCKER_INFLUXDB_INIT_USERNAME}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${DOCKER_INFLUXDB_INIT_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=${DOCKER_INFLUXDB_INIT_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${DOCKER_INFLUXDB_INIT_BUCKET}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUX_TOKEN}
     healthcheck:
       test: "curl -f http://localhost:8086/health || exit 1"
       interval: 5s
@@ -58,7 +63,7 @@ services:
     container_name: django_web
     command: gunicorn station_meteo.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - ./WEB_Station_Meteo:/app
+      - ./web:/app
       - static_volume:/app/staticfiles
     expose:
       - 8000
