@@ -15,8 +15,15 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copie du code source
 COPY . /app/
 
+# Copie du script d'entrypoint
+COPY entrypoint.sh /app/
+RUN chmod +x /app/entrypoint.sh
+
 # Port exposé
 EXPOSE 8000
 
-# Commande de lancement (sera surchargée par docker-compose mais utile par défaut)
-CMD ["gunicorn", "ton_projet.wsgi:application", "--bind", "0.0.0.0:8000"]
+# Définition de l'entrypoint
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Commande par défaut (passée à l'entrypoint via "$@")
+CMD ["gunicorn", "station_meteo.wsgi:application", "--bind", "0.0.0.0:8000"]
