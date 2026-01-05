@@ -7,7 +7,7 @@ After=docker.service network.target
 Type=oneshot
 RemainAfterExit=yes
 # Ajustez le chemin vers votre dossier projet
-WorkingDirectory=/home/arth/Projet/WEB_Station_Meteo
+WorkingDirectory=/home/meteo/WEB_Station_Meteo
 # Utilisation du plugin Docker Compose (v2)
 ExecStart=/usr/bin/docker compose up -d --remove-orphans
 ExecStop=/usr/bin/docker compose down
