@@ -121,7 +121,18 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# Security Settings
+# CSRF_TRUSTED_ORIGINS
+csrf_trusted_origins_env = os.environ.get("CSRF_TRUSTED_ORIGINS")
+if csrf_trusted_origins_env:
+    CSRF_TRUSTED_ORIGINS = csrf_trusted_origins_env.split(",")
+else:
+    CSRF_TRUSTED_ORIGINS = ['http://localhost']
+
+# SSL / Proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # InfluxDB Configuration (v1.8)
 INFLUXDB_URL = "http://influxdb:8086"  # Nom du service docker + port
