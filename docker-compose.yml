@@ -107,14 +107,24 @@ services:
   nginx:
     image: nginx:alpine
     container_name: nginx_proxy
-    ports:
-      - "80:80"
+    # ports:
+    #   - "80:80"  <-- Removed to funnel traffic through tunnel
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - static_volume:/app/staticfiles
     depends_on:
       web:
         condition: service_healthy
+    networks:
+      - internal_net
+    restart: always
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared_tunnel
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
     networks:
       - internal_net
     restart: always
