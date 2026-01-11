@@ -72,7 +72,8 @@ services:
           memory: 100M
 
   web:
-    build: ./web
+    image: ghcr.io/schwanstern/web_station_meteo:latest
+    pull_policy: always
     command: gunicorn station_meteo.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - ./web:/app
