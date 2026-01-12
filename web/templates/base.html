@@ -58,12 +58,14 @@
                         <i class="bi bi-graph-up mr-3"></i> Graph
                     </a>
                 </li>
+                {% if user.is_staff %}
                 <li>
                     <a href="{% url 'gestion' %}"
                         class="flex items-center px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-primary transition-colors">
                         <i class="bi bi-gear-fill mr-3"></i> Gestion
                     </a>
                 </li>
+                {% endif %}
             </ul>
 
             <div class="mt-auto flex justify-between pt-4 border-t border-gray-200 dark:border-gray-700">

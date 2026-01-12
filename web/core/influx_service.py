@@ -36,9 +36,9 @@ def check_connection():
     except:
         return False
 
-def query_measurements(measurement="ttn_uplink_student", duration="1h"):
+def query_measurements(measurement="mqtt_consumer", duration="1h"):
     """
-    Query metrics for a specific duration from ttn_uplink_student.
+    Query metrics for a specific duration from mqtt_consumer.
     duration examples: '1h', '24h', '7d'.
     """
     client = get_client()
@@ -102,7 +102,7 @@ def get_latest_data():
     query = f'''
     from(bucket: "{bucket}")
       |> range(start: -1y)
-      |> filter(fn: (r) => r["_measurement"] == "ttn_uplink_student")
+      |> filter(fn: (r) => r["_measurement"] == "mqtt_consumer")
       |> last()
       |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
     '''

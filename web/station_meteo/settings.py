@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "core",
 ]
 
 MIDDLEWARE = [
@@ -136,6 +137,6 @@ CSRF_COOKIE_SECURE = True
 
 # InfluxDB Configuration (v1.8)
 INFLUXDB_URL = "http://influxdb:8086"  # Nom du service docker + port
-INFLUXDB_TOKEN = os.environ.get('DOCKER_INFLUXDB_INIT_ADMIN_TOKEN')
+INFLUXDB_TOKEN = os.environ.get('INFLUX_TOKEN')
 INFLUXDB_ORG = os.environ.get('DOCKER_INFLUXDB_INIT_ORG')
 INFLUXDB_BUCKET = os.environ.get('DOCKER_INFLUXDB_INIT_BUCKET')

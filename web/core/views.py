@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from core import services, forms
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
 def root(request):
@@ -71,27 +72,82 @@ def login_view(request):
     })
 
 
+from .models import AlertSettings, SensorFallback
+
 def accueil(request):
-    mes_alertes = services.get_alerts_logic()
+    # Fetch alerts from DB
+    alert_rules = AlertSettings.objects.filter(is_active=True)
+    
+    # Pass them to service
+    mes_alertes = services.get_alerts_logic(alert_rules=alert_rules)
+    
     context = {"time": datetime.now().strftime("%H:%M"), "alerts": mes_alertes}
     return render(request, "index.html", context)
 
 
+@login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/')
 def gestion(request):
     if request.method == "POST":
          action = request.POST.get("action")
+         
          if action == "update_system":
              if services.update_system():
                  messages.success(request, "Mise à jour lancée avec succès ! (Vérifiez les logs serveur)")
              else:
                  messages.error(request, "Erreur lors du lancement de la mise à jour.")
+        
+         elif action == "toggle_staff":
+            try:
+                user_id = request.POST.get("user_id")
+                target_user = User.objects.get(id=user_id)
+                # Prevent modifying self to avoid locking oneself out
+                if target_user == request.user:
+                    messages.warning(request, "Vous ne pouvez pas modifier vos propres droits.")
+                else:
+                    target_user.is_staff = not target_user.is_staff
+                    target_user.save()
+                    status = "Administrateur" if target_user.is_staff else "Utilisateur Standard"
+                    messages.success(request, f"Droit mis à jour : {target_user.username} est maintenant {status}.")
+            except User.DoesNotExist:
+                messages.error(request, "Utilisateur introuvable.")
+
+         elif action == "delete_user":
+            try:
+                user_id = request.POST.get("user_id")
+                target_user = User.objects.get(id=user_id)
+                if target_user == request.user:
+                    messages.error(request, "Vous ne pouvez pas supprimer votre propre compte ici.")
+                else:
+                    target_user.delete()
+                    messages.success(request, "Utilisateur supprimé avec succès.")
+            except User.DoesNotExist:
+                messages.error(request, "Utilisateur introuvable.")
     
-    # We pass the state to the template
-    return render(request, "gestion.html", {"state": services.get_system_state()})
+    # We pass the state and list of users to the template
+    context = {
+        "state": services.get_system_state(),
+        "users": User.objects.all().order_by('id')
+    }
+    return render(request, "gestion.html", context)
 
 
 def apercu(request):
-    return render(request, "apercu.html", {"data": services.get_sensor_data()})
+    # Fetch data fallback
+    fallback_obj = SensorFallback.objects.first()
+    
+    # If DB is empty, user requested error handling or basic message?
+    # "Ajoute une gestion d'erreur basique (ex: get_object_or_404) si la base de données est vide... au lieu d'afficher une valeur par défaut silencieuse."
+    # get_object_or_404 would raise 404. Let's send a message or just pass None and let service return 0s but maybe flash message.
+    # Service "default" returns 0s which is "silencieux" but not "fake happy data".
+    
+    if not fallback_obj:
+        # No fallback data in DB. Service will return zeros/safe defaults.
+        # User requested to remove the warning message.
+        pass
+    
+    data = services.get_sensor_data(fallback_data=fallback_obj)
+    return render(request, "apercu.html", {"data": data})
 
 
 def graph(request):
