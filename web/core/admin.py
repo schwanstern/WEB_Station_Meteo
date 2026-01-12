@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import AlertSettings, SensorFallback
 
-# Register your models here.
+admin.site.register(AlertSettings)
+admin.site.register(SensorFallback)

@@ -1,5 +1,5 @@
 from datetime import datetime
-import random
+
 
 # Initial state
 import os
@@ -22,8 +22,12 @@ def safe_float(val):
     except (ValueError, TypeError):
         return 0.0
 
-def get_sensor_data():
-    """Fetch sensor data from InfluxDB, fallback to mock if failure/empty."""
+def get_sensor_data(fallback_data=None):
+    """
+    Fetch sensor data from InfluxDB.
+    If failure or empty, use fallback_data (SensorFallback model instance) if provided,
+    otherwise default to zero/safe values.
+    """
     real_data = influx_service.get_latest_data()
     
     if real_data:
@@ -51,59 +55,97 @@ def get_sensor_data():
             "luminosite": int(safe_float(real_data.get('luminosite', 0))),
         }
         
-    # Fallback / Mock Data
-    direction_texte = "S"
-    mapping_direction = { "N": 0, "NE": 45, "E": 90, "SE": 135, "S": 180, "SW": 225, "W": 270, "NW": 315 }
-    angle = mapping_direction.get(direction_texte, 0)
+    # Fallback / Mock Data from DB
+    if fallback_data:
+        return {
+            "vent_vitesse": fallback_data.vent_vitesse,
+            "vent_dir": fallback_data.vent_dir,
+            "vent_angle": fallback_data.vent_angle,
+            "temperature": fallback_data.temperature,
+            "humidite": fallback_data.humidite,
+            "pression": fallback_data.pression,
+            "luminosite": fallback_data.luminosite,
+        }
 
+    # Ultimate fallback if no DB model exists yet
     return {
-        "vent_vitesse": 25,
-        "vent_dir": direction_texte,
-        "vent_angle": angle,
-        "temperature": 22.5,
-        "humidite": 60,
+        "vent_vitesse": 0,
+        "vent_dir": "N",
+        "vent_angle": 0,
+        "temperature": 0,
+        "humidite": 0,
         "pression": 1013,
-        "luminosite": 750,
+        "luminosite": 0,
     }
 
-def get_alerts_logic():
-    """Generate alerts based on sensor data and system state."""
+def get_alerts_logic(alert_rules=None):
+    """Generate alerts based on sensor data and system state, using DB rules."""
     alerts = []
-    data = get_sensor_data()
+    # Note: get_sensor_data now requires fallback logic if we want to be safe,
+    # but for alerts usually we check real data or we simply skip if no data.
+    # calling get_sensor_data without fallback will return '0's as ultimate fallback
+    data = get_sensor_data(fallback_data=None) 
     
     # Get system state (real)
     sys_state = get_system_state()
+    
+    mapping = {
+        'wind_speed': data.get('vent_vitesse', 0),
+        'temperature': data.get('temperature', 0),
+        'humidity': data.get('humidite', 0),
+        'pressure': data.get('pression', 0),
+        # sys_update handled separately
+    }
 
-    if data["vent_vitesse"] > 15:
-        alerts.append(
-            {
-                "titre": "VENT FORT",
-                "message": f"La vitesse du vent est de {data['vent_vitesse']} km/h.",
-                "type": "danger",
-                "icon": "bi-exclamation-triangle-fill",
-            }
-        )
-    else:
-        alerts.append(
-            {
-                "titre": "Météo Calme",
-                "message": "Conditions normales.",
-                "type": "success",
-                "icon": "bi-check-circle-fill",
-            }
-        )
+    if alert_rules:
+        for rule in alert_rules:
+            if not rule.is_active:
+                continue
+                
+            if rule.metric == 'sys_update':
+                 if sys_state.get("update_available", False):
+                     alerts.append({
+                        "titre": rule.name,
+                        "message": rule.message,
+                        "type": rule.alert_type,
+                        "icon": rule.icon,
+                        "action_link": "/gestion",
+                     })
+                 continue
 
-    if sys_state.get("update_available", False):
-        alerts.append(
-            {
-                "titre": "MISE À JOUR DISPONIBLE",
-                "message": "Une nouvelle version est prête.",
-                "type": "primary",
-                "icon": "bi-cloud-arrow-down-fill",
-                "action_link": "/gestion",
-            }
-        )
-
+            val = mapping.get(rule.metric)
+            if val is not None:
+                # Check min (exclusive)
+                if rule.min_value is not None and val <= rule.min_value:
+                    continue # Not triggered
+                # Check max (exclusive)
+                if rule.max_value is not None and val >= rule.max_value:
+                    continue # Not triggered
+                
+                # If we are here, does it mean it IS triggered?
+                # Usually alerts are: "If val > max then ALERT".
+                # But here I defined min/max.
+                # Let's assume the rule defines the "Danger Zone" or "Target Zone"?
+                # Standard pattern: Alert if Value > Max OR Value < Min.
+                # Let's adjust logic:
+                # If rule has Max only: Trigger if Val > Max
+                # If rule has Min only: Trigger if Val < Min
+                # If rule has both: Trigger if Val < Min OR Val > Max (Out of range)
+                
+                triggered = False
+                if rule.max_value is not None and val > rule.max_value:
+                    triggered = True
+                if rule.min_value is not None and val < rule.min_value:
+                    triggered = True
+                    
+                if triggered:
+                    alerts.append({
+                        "titre": rule.name,
+                        "message": rule.message.format(val=val), # Allow simple formatting
+                        "type": rule.alert_type,
+                        "icon": rule.icon,
+                    })
+    
     return alerts
 
 
@@ -111,7 +153,7 @@ def get_historical_data(period="1h"):
     """Generate historical data for the graph from InfluxDB."""
     
     # 1. Fetch real data
-    points = influx_service.query_measurements("ttn_uplink_student", duration=period)
+    points = influx_service.query_measurements("mqtt_consumer", duration=period)
     
     if points:
         labels = []
@@ -149,11 +191,16 @@ def get_historical_data(period="1h"):
             "period_label": titre_periode,
         }
 
-    # 2. Fallback to Random Mock Data if no real data
+    # 2. Fallback to Empty Data if no real data
+    # (Previously random simulation, now removed to force real data usage)
     if period == "5m":
         labels = ["T-5", "T-4", "T-3", "T-2", "T-1", "Maintenant"]
         points_count = 6
         titre_periode = "Dernières 5 minutes"
+    elif period == "15m":
+        labels = ["T-15", "T-10", "T-5", "Maintenant"]
+        points_count = 4 # Approx
+        titre_periode = "Dernières 15 minutes"
     elif period == "24h":
         labels = [f"{i}h" for i in range(0, 25, 2)]
         points_count = 13
@@ -168,11 +215,11 @@ def get_historical_data(period="1h"):
         titre_periode = "Dernière heure"
 
     datasets = {
-        "vent": [random.randint(5, 30) for _ in range(points_count)],
-        "temp": [random.randint(15, 25) for _ in range(points_count)],
-        "hum": [random.randint(40, 80) for _ in range(points_count)],
-        "press": [random.randint(1010, 1020) for _ in range(points_count)],
-        "lux": [random.randint(0, 1000) for _ in range(points_count)],
+        "vent": [0] * points_count,
+        "temp": [0] * points_count,
+        "hum": [0] * points_count,
+        "press": [0] * points_count,
+        "lux": [0] * points_count,
     }
 
     return {

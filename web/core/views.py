@@ -72,8 +72,15 @@ def login_view(request):
     })
 
 
+from .models import AlertSettings, SensorFallback
+
 def accueil(request):
-    mes_alertes = services.get_alerts_logic()
+    # Fetch alerts from DB
+    alert_rules = AlertSettings.objects.filter(is_active=True)
+    
+    # Pass them to service
+    mes_alertes = services.get_alerts_logic(alert_rules=alert_rules)
+    
     context = {"time": datetime.now().strftime("%H:%M"), "alerts": mes_alertes}
     return render(request, "index.html", context)
 
@@ -126,7 +133,21 @@ def gestion(request):
 
 
 def apercu(request):
-    return render(request, "apercu.html", {"data": services.get_sensor_data()})
+    # Fetch data fallback
+    fallback_obj = SensorFallback.objects.first()
+    
+    # If DB is empty, user requested error handling or basic message?
+    # "Ajoute une gestion d'erreur basique (ex: get_object_or_404) si la base de données est vide... au lieu d'afficher une valeur par défaut silencieuse."
+    # get_object_or_404 would raise 404. Let's send a message or just pass None and let service return 0s but maybe flash message.
+    # Service "default" returns 0s which is "silencieux" but not "fake happy data".
+    
+    if not fallback_obj:
+        # No fallback data in DB. Service will return zeros/safe defaults.
+        # User requested to remove the warning message.
+        pass
+    
+    data = services.get_sensor_data(fallback_data=fallback_obj)
+    return render(request, "apercu.html", {"data": data})
 
 
 def graph(request):
