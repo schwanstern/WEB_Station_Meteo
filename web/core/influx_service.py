@@ -27,6 +27,15 @@ def get_client():
         logger.error(f"Config: URL={settings.INFLUXDB_URL}, ORG={settings.INFLUXDB_ORG}, TOKEN={'*' * 5 if settings.INFLUXDB_TOKEN else 'None'}")
         raise e
 
+
+def check_connection():
+    """Simple ping to check InfluxDB connection."""
+    try:
+        client = get_client()
+        return client.ping()
+    except:
+        return False
+
 def query_measurements(measurement="ttn_uplink_student", duration="1h"):
     """
     Query metrics for a specific duration from ttn_uplink_student.
