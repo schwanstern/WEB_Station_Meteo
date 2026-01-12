@@ -78,6 +78,7 @@ services:
     volumes:
       - ./web:/app
       - static_volume:/app/staticfiles
+      - ./system_data:/app/system_data
     expose:
       - 8000
     env_file:

@@ -79,10 +79,12 @@ def accueil(request):
 
 def gestion(request):
     if request.method == "POST":
-        form = forms.UpdateSystemForm(request.POST)
-        if form.is_valid():
+         action = request.POST.get("action")
+         if action == "update_system":
              if services.update_system():
-                 messages.success(request, "Mise à jour effectuée avec succès !")
+                 messages.success(request, "Mise à jour lancée avec succès ! (Vérifiez les logs serveur)")
+             else:
+                 messages.error(request, "Erreur lors du lancement de la mise à jour.")
     
     # We pass the state to the template
     return render(request, "gestion.html", {"state": services.get_system_state()})
