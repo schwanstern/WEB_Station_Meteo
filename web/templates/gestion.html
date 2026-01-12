@@ -9,7 +9,8 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <!-- Postgres Status -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
             <div class="flex items-center">
                 <i class="bi bi-database-fill text-xl text-blue-500 mr-3"></i>
                 <div>
@@ -25,7 +26,8 @@
         </div>
 
         <!-- InfluxDB Status -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
             <div class="flex items-center">
                 <i class="bi bi-activity text-xl text-purple-500 mr-3"></i>
                 <div>
@@ -41,7 +43,8 @@
         </div>
 
         <!-- Network Status -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
             <div class="flex items-center">
                 <i class="bi bi-hdd-network text-xl text-orange-500 mr-3"></i>
                 <div>
@@ -57,7 +60,8 @@
         </div>
 
         <!-- TTN Status -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
             <div class="flex items-center">
                 <i class="bi bi-broadcast text-xl text-teal-500 mr-3"></i>
                 <div>
@@ -80,7 +84,8 @@
             {% if state.update_available %}
             <i class="bi bi-cloud-arrow-down text-5xl text-blue-500 mb-4"></i>
             <h4 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Mise à jour disponible</h4>
-            <p class="text-gray-500 dark:text-gray-400 mb-6">{{ state.updates_count }} paquets peuvent être mis à jour.</p>
+            <p class="text-gray-500 dark:text-gray-400 mb-6">{{ state.updates_count }} paquets peuvent être mis à jour.
+            </p>
 
             <form method="POST">
                 {% csrf_token %}

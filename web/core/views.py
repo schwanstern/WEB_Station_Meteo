@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from core import services, forms
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
 def root(request):
@@ -77,17 +78,51 @@ def accueil(request):
     return render(request, "index.html", context)
 
 
+@login_required
+@user_passes_test(lambda u: u.is_staff, login_url='/')
 def gestion(request):
     if request.method == "POST":
          action = request.POST.get("action")
+         
          if action == "update_system":
              if services.update_system():
                  messages.success(request, "Mise à jour lancée avec succès ! (Vérifiez les logs serveur)")
              else:
                  messages.error(request, "Erreur lors du lancement de la mise à jour.")
+        
+         elif action == "toggle_staff":
+            try:
+                user_id = request.POST.get("user_id")
+                target_user = User.objects.get(id=user_id)
+                # Prevent modifying self to avoid locking oneself out
+                if target_user == request.user:
+                    messages.warning(request, "Vous ne pouvez pas modifier vos propres droits.")
+                else:
+                    target_user.is_staff = not target_user.is_staff
+                    target_user.save()
+                    status = "Administrateur" if target_user.is_staff else "Utilisateur Standard"
+                    messages.success(request, f"Droit mis à jour : {target_user.username} est maintenant {status}.")
+            except User.DoesNotExist:
+                messages.error(request, "Utilisateur introuvable.")
+
+         elif action == "delete_user":
+            try:
+                user_id = request.POST.get("user_id")
+                target_user = User.objects.get(id=user_id)
+                if target_user == request.user:
+                    messages.error(request, "Vous ne pouvez pas supprimer votre propre compte ici.")
+                else:
+                    target_user.delete()
+                    messages.success(request, "Utilisateur supprimé avec succès.")
+            except User.DoesNotExist:
+                messages.error(request, "Utilisateur introuvable.")
     
-    # We pass the state to the template
-    return render(request, "gestion.html", {"state": services.get_system_state()})
+    # We pass the state and list of users to the template
+    context = {
+        "state": services.get_system_state(),
+        "users": User.objects.all().order_by('id')
+    }
+    return render(request, "gestion.html", context)
 
 
 def apercu(request):
