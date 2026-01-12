@@ -59,6 +59,14 @@ jobs:
           git fetch origin
           git reset --hard origin/master
 
+      - name: Create .env file from Secrets
+        env:
+          # On charge le secret dans une variable d'environnement temporaire
+          ENV_CONTENT: ${{ secrets.ENV_FILE }}
+        run: |
+          # On écrit le contenu de la variable dans le fichier .env
+          echo "$ENV_CONTENT" > .env
+
       - name: Update containers
         run: |
           docker compose pull
