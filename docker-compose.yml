@@ -3,7 +3,7 @@ services:
     image: postgres:15-alpine
     container_name: postgres_db
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - /opt/meteo_data/postgres/postgres_data:/var/lib/postgresql/data
     env_file:
       - .env
     networks:
