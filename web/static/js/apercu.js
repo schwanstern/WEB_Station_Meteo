@@ -20,23 +20,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Gestion de la Boussole
     const needle = document.getElementById('needle');
     if (needle) {
-        needle.style.transform = `rotate(${data.vent_angle}deg)`;
+        // Validation basique pour éviter NaN
+        const angle = isNaN(data.vent_angle) ? 0 : data.vent_angle;
+        needle.style.transform = `rotate(${angle}deg)`;
     }
 
     // 3. Gestion des Jauges (Charts)
-    // Couleur vide selon le thème (simplifié, on prend gris clair/foncé selon mode lors de l'init)
-    // Pour être parfaitement dynamique si on change de thème sans reload, il faudrait un observer, 
-    // mais Chart.js n'est pas réactif au CSS externe facilement sans plugin.
-    // On va faire un check initial.
+    // Récupération dynamique des couleurs définies dans style.css
+    const styles = getComputedStyle(document.body);
+    const colors = {
+        temp: styles.getPropertyValue('--chart-temp').trim() || '#ef4444',
+        hum: styles.getPropertyValue('--chart-hum').trim() || '#3b82f6',
+        wind: styles.getPropertyValue('--chart-wind').trim() || '#9ca3af',
+        press: styles.getPropertyValue('--chart-press').trim() || '#10b981',
+        lux: styles.getPropertyValue('--chart-lux').trim() || '#eab308',
+        emptyLight: styles.getPropertyValue('--chart-empty-light').trim() || 'rgba(0,0,0,0.1)',
+    };
 
-    const isDark = document.documentElement.classList.contains('dark');
-    const colorEmpty = isDark ? '#111827' : '#f3f4f6';
+    // Fonction helper pour déterminer la couleur de fond "vide" selon le thème
+    const emptyColor = colors.emptyLight;
 
-    createGauge('tempChart', data.temperature, 50, '#ef4444', colorEmpty);
-    createGauge('humChart', data.humidite, 100, '#3b82f6', colorEmpty);
-    createGauge('windChart', data.vent_vitesse, 100, '#9ca3af', colorEmpty);
-    createGauge('pressChart', data.pression - 900, 150, '#22c55e', colorEmpty);
-    createGauge('luxChart', data.luminosite, 1000, '#eab308', colorEmpty);
+    // Valeurs safe (0 si NaN)
+    const val = (v) => isNaN(v) ? 0 : v;
+
+    createGauge('tempChart', val(data.temperature), 50, colors.temp, emptyColor);
+    createGauge('humChart', val(data.humidite), 100, colors.hum, emptyColor);
+    createGauge('windChart', val(data.vent_vitesse), 100, colors.wind, emptyColor);
+
+    // Pression standard ~1013. On affiche l'écart vs 900 pour visibilité
+    const pressVal = Math.max(0, val(data.pression) - 900);
+    createGauge('pressChart', pressVal, 150, colors.press, emptyColor);
+
+    // Lux échelle 1000
+    createGauge('luxChart', val(data.luminosite), 1000, colors.lux, emptyColor);
 });
 
 function createGauge(ctxId, value, max, color, colorEmpty) {
@@ -44,24 +60,31 @@ function createGauge(ctxId, value, max, color, colorEmpty) {
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    const remaining = Math.max(0, max - value);
+    const safeValue = Math.max(0, Math.min(value, max)); // Clamp
+    const remaining = max - safeValue;
 
     new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ["Valeur", "Reste"],
+            labels: ["Valeur", "Vide"],
             datasets: [{
-                data: [value, remaining],
+                data: [safeValue, remaining],
                 backgroundColor: [color, colorEmpty],
-                borderWidth: 0
+                borderWidth: 0,
+                borderRadius: 20, // Bords arrondis modernes
+                offset: 0
             }]
         },
         options: {
             rotation: -90,
             circumference: 180,
-            cutout: '70%',
+            cutout: '85%', // Anneau fin
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            },
             plugins: {
                 legend: { display: false },
                 tooltip: { enabled: false }

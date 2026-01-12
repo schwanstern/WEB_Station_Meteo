@@ -6,123 +6,199 @@
 /* Transition globale smooth pour le theme switch */
 body {
     transition: background-color 0.3s, color 0.3s;
+
+    /* Variables de couleurs pour les graphiques (accessibles via JS) */
+    --chart-temp: #f87171;
+    /* Red-400 */
+    --chart-hum: #60a5fa;
+    /* Blue-400 */
+    --chart-wind: #94a3b8;
+    /* Slate-400 */
+    --chart-press: #34d399;
+    /* Emerald-400 */
+    --chart-lux: #fbbf24;
+    /* Amber-400 */
+    --chart-empty-light: rgba(0, 0, 0, 0.1);
+    --chart-empty-dark: rgba(255, 255, 255, 0.1);
 }
 
 /* --- CSS BOUSSOLE ADAPTÉE TAILWIND --- */
-/* On utilise les variables CSS de Tailwind si possible ou des couleurs explicites */
 .compass-container {
     position: relative;
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     margin: 0 auto;
 
-    border: 4px solid #e5e7eb;
+    /* Moderne : Gradient et Ombre */
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    border: 8px solid #e5e7eb;
     /* gray-200 */
-    background: #ffffff;
-    box-shadow: inset 0 0 20px #f3f4f6;
-    /* gray-100 */
+    box-shadow:
+        5px 5px 15px rgba(0, 0, 0, 0.1),
+        inset 0 0 20px rgba(0, 0, 0, 0.05);
 
     transition: all 0.3s ease;
 }
 
-/* Dark mode override via sélecteur parent .dark */
 .dark .compass-container {
+    background: linear-gradient(145deg, #1f2937, #111827);
     border-color: #374151;
     /* gray-700 */
-    background: #1f2937;
-    /* gray-800 */
-    box-shadow: inset 0 0 20px #111827;
-    /* gray-900 */
+    box-shadow:
+        5px 5px 15px rgba(0, 0, 0, 0.5),
+        inset 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
+/* Labels Cardinaux */
 .compass-label {
     position: absolute;
-    font-weight: bold;
-    font-size: 0.9em;
-    color: #374151;
-    /* gray-700 */
+    font-weight: 800;
+    font-size: 1.1em;
+    color: #4b5563;
+    /* gray-600 */
+    pointer-events: none;
 }
 
 .dark .compass-label {
-    color: #d1d5db;
-    /* gray-300 */
+    color: #9ca3af;
+    /* gray-400 */
 }
 
+/* North Highlight */
 .label-n {
-    top: 5px;
+    top: 10px;
     left: 50%;
     transform: translateX(-50%);
     color: #dc2626;
     /* red-600 */
+    font-size: 1.3em;
 }
 
 .label-s {
-    bottom: 5px;
+    bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .label-e {
-    right: 10px;
+    right: 15px;
     top: 50%;
     transform: translateY(-50%);
 }
 
 .label-w {
-    left: 10px;
+    left: 15px;
     top: 50%;
     transform: translateY(-50%);
 }
 
+/* Aiguille style "Compas Magnétique" */
 .compass-needle {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 6px;
-    height: 100px;
+    width: 0;
+    height: 0;
     transform-origin: center center;
-    margin-top: -50px;
-    margin-left: -3px;
-    transition: transform 1s cubic-bezier(0.4, 2.5, 0.6, 0.5);
+    transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 10;
 }
 
+/* Pointe Nord (Rouge) */
+/* La base du triangle est "collée au centre" (bottom: 0) */
+/* La pointe part vers le haut */
 .compass-needle::before {
     content: '';
     position: absolute;
-    top: 10px;
-    left: -5px;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 50px solid #dc2626;
-    /* red-600 */
+    bottom: 0;
+    left: -10px;
+    /* Base width 20px */
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 70px solid #dc2626;
+    /* Longueur 70px */
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
 }
 
+/* Pointe Sud (Grise/Blanche) */
+/* La base du triangle est "collée au centre" (top: 0) */
+/* La pointe part vers le bas */
 .compass-needle::after {
     content: '';
     position: absolute;
-    bottom: 10px;
-    left: -5px;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 50px solid #9ca3af;
-    /* gray-400 */
+    top: 0;
+    left: -10px;
+    /* Base width 20px */
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 70px solid #d1d5db;
+    /* Longueur 70px */
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
 }
 
+.dark .compass-needle::after {
+    border-top-color: #4b5563;
+    /* gray-600 en dark mode */
+}
+
+/* Pivot central */
 .compass-center {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 10px;
-    height: 10px;
-    background: #374151;
-    /* gray-700 */
+    width: 14px;
+    height: 14px;
+    background: #1f2937;
+    /* gray-800 */
+    border: 3px solid #e5e7eb;
+    /* blanc/gris */
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    z-index: 10;
-    box-shadow: 0 0 2px #9ca3af;
+    z-index: 20;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
 .dark .compass-center {
-    background: #d1d5db;
+    background: #e5e7eb;
+    border-color: #1f2937;
+}
+
+/* Petite décoration tick marks simplifiée */
+.compass-container::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 1px dashed #d1d5db;
+    opacity: 0.5;
+}
+
+.dark .compass-container::after {
+    border-color: #4b5563;
+}
+
+/* Valeur centrale (Angle) */
+.compass-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5em;
+    /* Réduit pour passer entre les aiguilles */
+    font-weight: 800;
+    color: #e5e7eb;
+    /* Gris très clair pour fond discret */
+    z-index: 5;
+    pointer-events: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.dark .compass-value {
+    color: #374151;
+    /* Gris foncé sur fond foncé */
 }
