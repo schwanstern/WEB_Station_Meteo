@@ -25,7 +25,7 @@ services:
     container_name: postgres_db
     shm_size: 128mb
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     env_file:
       - .env
     <<: [ *default-restart, *default-network ]
@@ -165,9 +165,10 @@ services:
 # 3. VOLUMES & RÉSEAUX
 # ==========================================
 volumes:
-  pg_data:
-  influx_data:
-  influx_config:
+  postgres_data:
+  influxdb_data:
+  influxdb_config:
+  static_volume:
 
 
 networks:
