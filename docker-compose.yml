@@ -165,9 +165,10 @@ services:
 # 3. VOLUMES & RÉSEAUX
 # ==========================================
 volumes:
-  pg_data:
-  influx_data:
-  influx_config:
+  postgres_data:
+  influxdb_data:
+  influxdb_config:
+  static_volume:
 
 
 networks:
