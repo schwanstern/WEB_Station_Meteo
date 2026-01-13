@@ -12,8 +12,16 @@ const configs = {
     'lux': { label: 'Luminosité (Lux)', color: '#f1c40f', axis: 'y1' }
 };
 
-// 3. État actuel : Quelles mesures sont affichées ? (Vent par défaut)
-const activeKeys = new Set(['vent']);
+// 3. État actuel : Quelles mesures sont affichées ?
+// Récupération depuis le localStorage ou défaut 'vent'
+let savedKeys;
+try {
+    savedKeys = JSON.parse(localStorage.getItem('meteo_active_keys'));
+} catch (e) {
+    savedKeys = null;
+}
+
+const activeKeys = new Set(savedKeys || ['vent']);
 
 // --- Initialisation Chart.js ---
 const ctx = document.getElementById('meteoChart').getContext('2d');
@@ -31,6 +39,7 @@ function renderChart() {
     const datasets = [];
     activeKeys.forEach(key => {
         const cfg = configs[key];
+        if (!cfg) return; // Sécurité si une clé inconnue est en cache
         datasets.push({
             label: cfg.label,
             data: allData[key],
@@ -88,43 +97,52 @@ function renderChart() {
 
 // 4. Fonction Toggle (disponible globalement pour le onclick HTML)
 window.toggleData = function (key) {
-    const btn = document.getElementById('btn-' + key);
-    if (!btn) return;
+    if (activeKeys.has(key)) {
+        // Désactivation
+        activeKeys.delete(key);
+    } else {
+        // Activation
+        activeKeys.add(key);
+    }
 
-    // Définition exhaustive des classes pour les deux états (Light + Dark)
-    // Cela inclut les classes de base et les overrides dark mode
+    // Sauvegarde
+    localStorage.setItem('meteo_active_keys', JSON.stringify([...activeKeys]));
+
+    // Update UI
+    updateButtonsState();
+    renderChart();
+};
+
+function updateButtonsState() {
+    // Définition exhaustive des classes
     const activeClasses = [
         'bg-blue-600', 'text-white', 'border-blue-600', 'hover:bg-blue-700',
-        'dark:bg-blue-600', 'dark:border-blue-600', 'dark:text-white' // Force active style in dark mode too
+        'dark:bg-blue-600', 'dark:border-blue-600', 'dark:text-white'
     ];
-
     const inactiveClasses = [
         'bg-white', 'text-gray-900', 'border-gray-200', 'hover:bg-gray-100', 'hover:text-blue-700',
         'dark:bg-gray-700', 'dark:text-white', 'dark:border-gray-600', 'dark:hover:bg-gray-600'
     ];
 
-    // Helper: Remove BOTH sets of classes, then add the target set
-    // This ensures no conflicting classes remain
-    const updateClasses = (element, targetClasses) => {
-        element.classList.remove(...activeClasses);
-        element.classList.remove(...inactiveClasses);
-        element.classList.add(...targetClasses);
-    };
+    // Pour chaque clé possible dans configs, on met à jour le bouton correspondant
+    Object.keys(configs).forEach(key => {
+        const btn = document.getElementById('btn-' + key);
+        if (!btn) return;
 
-    if (activeKeys.has(key)) {
-        // Désactivation
-        activeKeys.delete(key);
-        updateClasses(btn, inactiveClasses);
-    } else {
-        // Activation
-        activeKeys.add(key);
-        updateClasses(btn, activeClasses);
-    }
+        // Reset
+        btn.classList.remove(...activeClasses);
+        btn.classList.remove(...inactiveClasses);
 
-    renderChart();
-};
+        if (activeKeys.has(key)) {
+            btn.classList.add(...activeClasses);
+        } else {
+            btn.classList.add(...inactiveClasses);
+        }
+    });
+}
 
 // Démarrage
 document.addEventListener('DOMContentLoaded', () => {
+    updateButtonsState(); // Applique l'état visuel initial (depuis localStorage)
     renderChart();
 });

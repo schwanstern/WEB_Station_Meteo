@@ -27,9 +27,18 @@ def get_client():
         logger.error(f"Config: URL={settings.INFLUXDB_URL}, ORG={settings.INFLUXDB_ORG}, TOKEN={'*' * 5 if settings.INFLUXDB_TOKEN else 'None'}")
         raise e
 
-def query_measurements(measurement="ttn_uplink_student", duration="1h"):
+
+def check_connection():
+    """Simple ping to check InfluxDB connection."""
+    try:
+        client = get_client()
+        return client.ping()
+    except:
+        return False
+
+def query_measurements(measurement="mqtt_consumer", duration="1h"):
     """
-    Query metrics for a specific duration from ttn_uplink_student.
+    Query metrics for a specific duration from mqtt_consumer.
     duration examples: '1h', '24h', '7d'.
     """
     client = get_client()
@@ -93,7 +102,7 @@ def get_latest_data():
     query = f'''
     from(bucket: "{bucket}")
       |> range(start: -1y)
-      |> filter(fn: (r) => r["_measurement"] == "ttn_uplink_student")
+      |> filter(fn: (r) => r["_measurement"] == "mqtt_consumer")
       |> last()
       |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
     '''

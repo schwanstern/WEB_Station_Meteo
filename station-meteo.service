@@ -1,17 +1,26 @@
 [Unit]
 Description=Station Meteo Docker Compose Service
 Requires=docker.service
-After=docker.service network.target
+After=docker.service network-online.target
+Wants=network-online.target
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-# Ajustez le chemin vers votre dossier projet
 WorkingDirectory=/home/meteo/WEB_Station_Meteo
-# Utilisation du plugin Docker Compose (v2)
+
+# Augmenter le temps limite car le premier pull/build peut être long sur SD
+TimeoutStartSec=300
+
+# La commande de lancement
 ExecStart=/usr/bin/docker compose up -d --remove-orphans
+
+# La commande d'arrêt propre
 ExecStop=/usr/bin/docker compose down
-ExecReload=/usr/bin/docker compose up -d
+
+# CRUCIAL : Si la commande échoue (ex: Docker pas prêt), on réessaie
+Restart=on-failure
+RestartSec=10s
 
 [Install]
 WantedBy=multi-user.target
